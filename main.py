@@ -423,7 +423,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <header>
         <div class="header-container">
             <h1 id="title-banner">Hockey Charts</h1>
-            <div class="subtitle" id="subtitle-banner">All-Time Leaders Interactive Dashboard</div>
+            <div class="subtitle" id="subtitle-banner">Explore All-Time Statistical Leaders of Your Favorite NHL Franchise</div>
         </div>
     </header>
 
@@ -1294,6 +1294,42 @@ LINKS_HTML = """<!DOCTYPE html>
                     </div>
                     <div class="link-desc">
                         Comprehensive global hockey database detailing player career histories from youth hockey to professional leagues.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>Seattle Kraken Communities & Blogs</h2>
+            <ul>
+                <li>
+                    <div class="link-title">
+                        <a href="https://soundofhockey.com" target="_blank" rel="noopener">Sound of Hockey</a>
+                    </div>
+                    <div class="link-desc">
+                        Independent Seattle Kraken news, detailed hockey analytics, roster breakdowns, and home of the Sound of Hockey podcast.
+                    </div>
+                </li>
+                <li>
+                    <div class="link-title">
+                        <a href="https://www.reddit.com/r/SeattleKraken/" target="_blank" rel="noopener">r/SeattleKraken</a>
+                    </div>
+                    <div class="link-desc">
+                        The active Seattle Kraken community on Reddit for game day threads, fan discussions, news, and updates.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h2>Discussion Forums</h2>
+            <ul>
+                <li>
+                    <div class="link-title">
+                        <a href="https://hfboards.mandatory.com/" target="_blank" rel="noopener">HFBoards</a>
+                    </div>
+                    <div class="link-desc">
+                        The largest and most active ice hockey discussion forum on the web, covering the NHL, draft prospects, trade rumors, and historical archives.
                     </div>
                 </li>
             </ul>
