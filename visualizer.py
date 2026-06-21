@@ -119,6 +119,7 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
 
     fig.update_layout(
         barmode='stack',
+        margin=dict(t=60, b=80, l=50, r=80),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(

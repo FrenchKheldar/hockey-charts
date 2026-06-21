@@ -808,7 +808,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                             weight: 600
                         }
                     },
-                    margin: { t: 60, b: 80, l: 50, r: 20 },
+                    margin: { t: 60, b: 80, l: 50, r: 80 },
                     xaxis: {
                         tickangle: 45,
                         gridcolor: 'rgba(0, 0, 0, 0.06)',
