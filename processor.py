@@ -86,8 +86,23 @@ def fetch_player_flag(player_name, player_id):
                         break
         
         if country_code:
-            # Map 2-letter country code to flag emoji using regional indicator symbols
-            emoji = "".join(chr(127397 + ord(c)) for c in country_code.upper())
+            country_code = country_code.lower()
+            if country_code == 'su':
+                if player_id in ["bondrpe01"]:
+                    emoji = "🇸🇰"
+                elif player_id in ["vasilhe01"]:
+                    emoji = "🇱🇻"
+                else:
+                    emoji = "🇷🇺"
+            elif country_code == 'cs':
+                if player_id in ["hossama01", "bartelu01", "petroro02", "majesiv01", "tatarto01"]:
+                    emoji = "🇸🇰"
+                else:
+                    emoji = "🇨🇿"
+            else:
+                # Map 2-letter country code to flag emoji using regional indicator symbols
+                emoji = "".join(chr(127397 + ord(c)) for c in country_code.upper())
+                
             print(f" Found flag: {emoji} for country: {country_code.upper()}")
             return emoji
     except Exception as e:
@@ -234,6 +249,20 @@ def process_stats(team_short, table_type, flags_df, flags_path, data_dir):
             if flag:
                 new_flags_to_save.append({"Player": p, "Flag": flag, "url": player_id})
                 
+        # Dynamically map historical/unsupported flags to modern supported equivalents
+        if flag == "🇸🇺" or flag == "SU":
+            if player_id in ["bondrpe01"]:
+                flag = "🇸🇰"  # Peter Bondra (Slovak)
+            elif player_id in ["vasilhe01"]:
+                flag = "🇱🇻"  # Herberts Vasiļjevs (Latvian)
+            else:
+                flag = "🇷🇺"  # Default Soviet Union -> Russian flag (Kovalchuk, Kozlov, etc.)
+        elif flag == "🇨🇸" or flag == "CS":
+            if player_id in ["hossama01", "bartelu01", "petroro02", "majesiv01", "tatarto01"]:
+                flag = "🇸🇰"  # Slovak (Hossa, Bartečko, Petrovický, Majeský, Tatar)
+            else:
+                flag = "🇨🇿"  # Default Czechoslovakia -> Czech flag (Stefan, Kaberle, etc.)
+
         total_row["Flag"] = flag
         total_rows.append(total_row)
 
