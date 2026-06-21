@@ -366,6 +366,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             color: var(--record-red);
         }
 
+        .active-indicator {
+            color: #10b981;
+            margin-left: 6px;
+            font-size: 0.75rem;
+            cursor: help;
+        }
+
         footer {
             text-align: center;
             padding: 2rem;
@@ -446,6 +453,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <div class="control-group">
                 <label>Statistical Category</label>
                 <div class="category-list" id="category-list"></div>
+            </div>
+
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; border-top: 1px solid var(--panel-border); padding-top: 1rem; font-family: 'Lora', Georgia, serif;">
+                <span style="color: #10b981; font-size: 0.95rem; line-height: 1;">●</span>
+                <span>Active Franchise Player</span>
             </div>
         </div>
 
@@ -741,9 +753,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 
                 // 5. Build stacked chart data structure
                 const traces = [];
-                // Use PlayerAbbrAndFlag for x-axis if available, fallback to displayCol
+                // Use PlayerAbbrAndFlag for x-axis if available, fallback to displayCol. Append green dot if active.
                 const abbrCol = "PlayerAbbrAndFlag";
-                const xLabels = topLeaders.map(r => r[abbrCol] || r[displayCol]);
+                const xLabels = topLeaders.map(r => {
+                    const baseName = r[abbrCol] || r[displayCol];
+                    return baseName + (r["Active"] ? ' <span style="color: #10b981;">●</span>' : '');
+                });
                 const fullNames = topLeaders.map(r => r[displayCol]);
                 const redColor = "rgb(228,24,46)"; // Standard record highlight color
                 
@@ -899,10 +914,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     }
                     
                     // Render Row Cells
+                    const activeDotHtml = leader["Active"] ? ' <span class="active-indicator" title="Active Franchise Player">●</span>' : '';
                     row.innerHTML = `
                         <td style="font-weight: 600; width: 60px;">#${idx + 1}</td>
                         <td style="font-weight: 500;">
-                            ${leader[displayCol]}
+                            ${leader[displayCol]}${activeDotHtml}
                         </td>
                         <td><span class="badge-pos">${leader[posCol] || 'N/A'}</span></td>
                         <td>${careerGP}</td>

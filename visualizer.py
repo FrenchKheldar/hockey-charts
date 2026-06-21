@@ -57,10 +57,19 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
     top_leaders = df.loc[df.Season == "Total"].sort_values(stat, ascending=False).iloc[:num]
     
     display_col = 'PlayerAbbrAndFlag' if 'PlayerAbbrAndFlag' in df.columns else 'PlayerAndFlag'
-    top_leaders = top_leaders[['Player', 'PlayerAndFlag', display_col, stat]].reset_index(drop=True)
+    cols_to_select = ['Player', 'PlayerAndFlag', display_col, stat]
+    if 'Active' in df.columns:
+        cols_to_select.append('Active')
+    top_leaders = top_leaders[cols_to_select].reset_index(drop=True)
 
     fig = go.Figure()
-    names = top_leaders[display_col].tolist()
+    if 'Active' in top_leaders.columns:
+        names = [
+            f"{row[display_col]} 🟢" if row['Active'] == 1 else row[display_col]
+            for idx, row in top_leaders.iterrows()
+        ]
+    else:
+        names = top_leaders[display_col].tolist()
     number_seasons = len(seasons)
 
     # Add bar trace for each season

@@ -248,6 +248,11 @@ def process_stats(team_short, table_type, flags_df, flags_path, data_dir):
     if total_rows:
         stacked_df = pd.concat([stacked_df] + total_rows, sort=True).reset_index(drop=True)
 
+    # Mark active players (played in the latest season of this dataset)
+    latest_season = seasons[-1] if seasons else ""
+    active_players = set(stacked_df[stacked_df.Season == latest_season].Player.unique())
+    stacked_df["Active"] = stacked_df["Player"].apply(lambda p: 1 if p in active_players else 0)
+
     # Create Display Name
     stacked_df["Flag"] = stacked_df["Flag"].fillna("")
     stacked_df["PlayerAndFlag"] = stacked_df["Player"] + stacked_df["Flag"].apply(lambda f: f" {f}" if f else "")
