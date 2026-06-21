@@ -55,10 +55,12 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
     """
     # Filter for career totals and sort by the stat
     top_leaders = df.loc[df.Season == "Total"].sort_values(stat, ascending=False).iloc[:num]
-    top_leaders = top_leaders[['Player', 'PlayerAndFlag', stat]].reset_index(drop=True)
+    
+    display_col = 'PlayerAbbrAndFlag' if 'PlayerAbbrAndFlag' in df.columns else 'PlayerAndFlag'
+    top_leaders = top_leaders[['Player', 'PlayerAndFlag', display_col, stat]].reset_index(drop=True)
 
     fig = go.Figure()
-    names = top_leaders['PlayerAndFlag'].tolist()
+    names = top_leaders[display_col].tolist()
     number_seasons = len(seasons)
 
     # Add bar trace for each season
@@ -71,11 +73,20 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
         # Color single season records in Red, otherwise use the team color gradient
         colors = [RED_RGB if st == single_season_record else get_color_spectrum(n, team_colors, number_seasons) for st in stats]
         
+        # Build hovertemplate based on stat
+        hover_template = '<b>%{customdata}</b><br>%{data.name}: %{y}<extra></extra>'
+        if stat == "SV%":
+            hover_template = '<b>%{customdata}</b><br>%{data.name}: %{y:.3f}<extra></extra>'
+        elif stat == "GAA":
+            hover_template = '<b>%{customdata}</b><br>%{data.name}: %{y:.2f}<extra></extra>'
+
         trace_kwargs = {
             'name': s,
             'x': names,
             'y': stats,
             'marker_color': colors,
+            'customdata': top_leaders['PlayerAndFlag'].tolist(),
+            'hovertemplate': hover_template,
             'showlegend': False
         }
 

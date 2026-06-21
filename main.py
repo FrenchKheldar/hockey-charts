@@ -741,9 +741,20 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 
                 // 5. Build stacked chart data structure
                 const traces = [];
-                const xLabels = topLeaders.map(r => r[displayCol]);
+                // Use PlayerAbbrAndFlag for x-axis if available, fallback to displayCol
+                const abbrCol = "PlayerAbbrAndFlag";
+                const xLabels = topLeaders.map(r => r[abbrCol] || r[displayCol]);
+                const fullNames = topLeaders.map(r => r[displayCol]);
                 const redColor = "rgb(228,24,46)"; // Standard record highlight color
                 
+                // Set hover template based on statistic type
+                let hoverTemplateStr = '<b>%{customdata}</b><br>%{data.name}: %{y}<extra></extra>';
+                if (currentStat === "SV%") {
+                    hoverTemplateStr = '<b>%{customdata}</b><br>%{data.name}: %{y:.3f}<extra></extra>';
+                } else if (currentStat === "GAA") {
+                    hoverTemplateStr = '<b>%{customdata}</b><br>%{data.name}: %{y:.2f}<extra></extra>';
+                }
+
                 // For each season, build a bar trace
                 seasonsList.forEach((season, sIdx) => {
                     const yValues = [];
@@ -771,11 +782,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                         marker: {
                             color: markerColors
                         },
+                        customdata: fullNames,
+                        hovertemplate: hoverTemplateStr,
                         // Overlap settings for Plus/Minus charting
                         offsetgroup: currentStat === "PM" ? 0 : undefined,
                         width: currentStat === "PM" ? 0.3 : undefined,
-                        offset: currentStat === "PM" ? (0.3 * (sIdx - 1)) : undefined,
-                        hoverinfo: 'name+y+x'
+                        offset: currentStat === "PM" ? (0.3 * (sIdx - 1)) : undefined
                     });
                 });
                 

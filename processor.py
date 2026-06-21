@@ -111,6 +111,18 @@ def load_flags(flags_path):
         print(f"⚠️ Error loading flags: {e}")
         return pd.DataFrame(columns=["Player", "Flag", "url"])
 
+def abbreviate_name(name):
+    """Abbreviates a player name to initial + last name, e.g. Oliver Bjorkstrand -> O. Bjorkstrand."""
+    if not name:
+        return ""
+    parts = name.strip().split()
+    if len(parts) <= 1:
+        return name
+    first = parts[0]
+    initial = first[0] + "."
+    last = " ".join(parts[1:])
+    return f"{initial} {last}"
+
 def process_stats(team_short, table_type, flags_df, flags_path, data_dir):
     """
     Loads, standardizes, calculates career totals, and matches flags for skaters or goalies.
@@ -239,6 +251,12 @@ def process_stats(team_short, table_type, flags_df, flags_path, data_dir):
     # Create Display Name
     stacked_df["Flag"] = stacked_df["Flag"].fillna("")
     stacked_df["PlayerAndFlag"] = stacked_df["Player"] + stacked_df["Flag"].apply(lambda f: f" {f}" if f else "")
+    
+    # Create Abbreviated Display Name for charts (e.g. O. Bjorkstrand 🇩🇰)
+    stacked_df["PlayerAbbrAndFlag"] = stacked_df.apply(
+        lambda r: abbreviate_name(r["Player"]) + (f" {r['Flag']}" if r["Flag"] else ""),
+        axis=1
+    )
     
     # Ensure standard url column is clean
     if "url" in stacked_df.columns:
