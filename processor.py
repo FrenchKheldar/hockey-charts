@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-from config import SKATER_COLUMN_MAP, GOALIE_COLUMN_MAP
+from config import SKATER_COLUMN_MAP, GOALIE_COLUMN_MAP, TEAM_CONFIG
 
 def read_stats_csv(filepath):
     """
@@ -248,9 +248,17 @@ def process_stats(team_short, table_type, flags_df, flags_path, data_dir):
     if total_rows:
         stacked_df = pd.concat([stacked_df] + total_rows, sort=True).reset_index(drop=True)
 
-    # Mark active players (played in the latest season of this dataset)
+    # Mark active players (only if the franchise is currently active, i.e. its config end_year matches the global max end_year)
+    global_max_year = max(t["end_year"] for t in TEAM_CONFIG.values())
+    team_profile = TEAM_CONFIG.get(team_short, {})
+    team_end_year = team_profile.get("end_year", 0)
+
     latest_season = seasons[-1] if seasons else ""
-    active_players = set(stacked_df[stacked_df.Season == latest_season].Player.unique())
+    if team_end_year >= global_max_year:
+        active_players = set(stacked_df[stacked_df.Season == latest_season].Player.unique())
+    else:
+        active_players = set() # Historical franchise: no active players
+        
     stacked_df["Active"] = stacked_df["Player"].apply(lambda p: 1 if p in active_players else 0)
 
     # Create Display Name
