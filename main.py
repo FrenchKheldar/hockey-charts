@@ -931,6 +931,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             }
         });
     </script>
+    <!-- GoatCounter Analytics (Privacy-focused, cookie-less) -->
+    <script data-goatcounter="https://frenchkheldar.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
 """
