@@ -1,4 +1,4 @@
 # Data downloaded from: https://www.hockey-reference.com/teams/ATL/2010.html
-Rk,Player,Age,Goalie Stats_GP,Goalie Stats_GS,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_QS,Goalie Stats_QS%,Goalie Stats_RBS,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards
-1.0,Johan Hedberg,36.0,47,42.0,21,16,6,115,1355,1240,0.915,2.62,3,2631:57,23,0.548,6,96,5.2,2.96,8.7,0,1,1,6,Byng-45
-2.0,Ondřej Pavelec,22.0,42,40.0,14,18,7,127,1353,1226,0.906,3.29,2,2317:08,17,0.425,6,106,-6.9,3.73,7.3,0,1,1,0,
+Rk,Player,Age,Goalie Stats_GP,Goalie Stats_GS,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_QS,Goalie Stats_QS%,Goalie Stats_RBS,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards,url
+1.0,Johan Hedberg,36.0,47,42.0,21,16,6,115,1355,1240,0.915,2.62,3,2631:57,23,0.548,6,96,5.2,2.96,8.7,0,1,1,6,Byng-45,hedbejo01
+2.0,Ondřej Pavelec,22.0,42,40.0,14,18,7,127,1353,1226,0.906,3.29,2,2317:08,17,0.425,6,106,-6.9,3.73,7.3,0,1,1,0,,pavelon01

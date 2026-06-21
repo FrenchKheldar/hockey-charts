@@ -1,5 +1,5 @@
 # Data downloaded from: https://www.hockey-reference.com/teams/ATL/2008.html
-Rk,Player,Age,Goalie Stats_GP,Goalie Stats_GS,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_QS,Goalie Stats_QS%,Goalie Stats_RBS,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards
-1.0,Kari Lehtonen,24.0,48,45.0,17,22,5,131,1560,1429,0.916,2.9,4,2706:46,27,0.6,6,92,10.7,3.35,10.9,0,2,2,4,
-2.0,Johan Hedberg,34.0,36,32.0,14,15,3,111,1026,915,0.892,3.46,1,1927:14,12,0.375,8,119,-17.8,3.98,4.3,0,1,1,16,
-3.0,Ondřej Pavelec,20.0,7,5.0,3,3,0,18,190,172,0.905,3.11,0,347:16,2,0.4,0,104,-0.7,3.63,1.1,0,0,0,2,
+Rk,Player,Age,Goalie Stats_GP,Goalie Stats_GS,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_QS,Goalie Stats_QS%,Goalie Stats_RBS,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards,url
+1.0,Kari Lehtonen,24.0,48,45.0,17,22,5,131,1560,1429,0.916,2.9,4,2706:46,27,0.6,6,92,10.7,3.35,10.9,0,2,2,4,,lehtoka01
+2.0,Johan Hedberg,34.0,36,32.0,14,15,3,111,1026,915,0.892,3.46,1,1927:14,12,0.375,8,119,-17.8,3.98,4.3,0,1,1,16,,hedbejo01
+3.0,Ondřej Pavelec,20.0,7,5.0,3,3,0,18,190,172,0.905,3.11,0,347:16,2,0.4,0,104,-0.7,3.63,1.1,0,0,0,2,,pavelon01

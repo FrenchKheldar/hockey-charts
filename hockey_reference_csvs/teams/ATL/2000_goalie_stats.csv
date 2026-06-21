@@ -1,7 +1,7 @@
 # Data downloaded from: https://www.hockey-reference.com/teams/ATL/2000.html
-Rk,Player,Age,Goalie Stats_GP,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards
-1.0,Norm Maracle,25.0,32,4,19,2,94,852,758,0.89,3.49,1,1618:12,115,-12.5,3.97,3.8,0,0,0,0,
-2.0,Damian Rhodes,30.0,28,5,19,3,101,803,702,0.874,3.88,1,1561:21,132,-24.2,4.42,2.2,0,0,0,2,
-3.0,Scott Fankhouser,24.0,16,2,11,2,49,451,402,0.891,3.2,0,919:51,114,-5.9,3.65,2.1,0,0,0,4,
-4.0,Scott Langkow,24.0,15,3,11,0,55,395,340,0.861,4.31,0,765:07,146,-17.2,4.94,0.5,0,0,0,0,
-5.0,Rick Tabaracci,31.0,1,0,1,0,4,32,28,0.875,4.07,0,59:02,131,-0.9,5.08,0.1,0,0,0,0,
+Rk,Player,Age,Goalie Stats_GP,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards,url
+1.0,Norm Maracle,25.0,32,4,19,2,94,852,758,0.89,3.49,1,1618:12,115,-12.5,3.97,3.8,0,0,0,0,,maracno01
+2.0,Damian Rhodes,30.0,28,5,19,3,101,803,702,0.874,3.88,1,1561:21,132,-24.2,4.42,2.2,0,0,0,2,,rhodeda01
+3.0,Scott Fankhouser,24.0,16,2,11,2,49,451,402,0.891,3.2,0,919:51,114,-5.9,3.65,2.1,0,0,0,4,,fankhsc01
+4.0,Scott Langkow,24.0,15,3,11,0,55,395,340,0.861,4.31,0,765:07,146,-17.2,4.94,0.5,0,0,0,0,,langksc01
+5.0,Rick Tabaracci,31.0,1,0,1,0,4,32,28,0.875,4.07,0,59:02,131,-0.9,5.08,0.1,0,0,0,0,,tabarri01

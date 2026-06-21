@@ -1,4 +1,4 @@
 # Data downloaded from: https://www.hockey-reference.com/teams/ATL/2007.html
-Rk,Player,Age,Goalie Stats_GP,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards
-1.0,Kari Lehtonen,23.0,68,34,24,9,183,2075,1892,0.912,2.79,4,3934:00,93,13.6,3.02,14.2,0,1,1,6,
-2.0,Johan Hedberg,33.0,21,9,4,2,51,500,449,0.898,2.89,0,1057:16,108,-3.6,3.12,2.7,0,1,1,6,
+Rk,Player,Age,Goalie Stats_GP,Goalie Stats_W,Goalie Stats_L,Goalie Stats_T/O,Goalie Stats_GA,Goalie Stats_Shots,Goalie Stats_SV,Goalie Stats_SV%,Goalie Stats_GAA,Goalie Stats_SO,Goalie Stats_MIN,Goalie Stats_GA%-,Goalie Stats_GSAA,Goalie Stats_GAA/A,Goalie Stats_GPS,Scoring_G,Scoring_A,Scoring_PTS,PIM,Awards,url
+1.0,Kari Lehtonen,23.0,68,34,24,9,183,2075,1892,0.912,2.79,4,3934:00,93,13.6,3.02,14.2,0,1,1,6,,lehtoka01
+2.0,Johan Hedberg,33.0,21,9,4,2,51,500,449,0.898,2.89,0,1057:16,108,-3.6,3.12,2.7,0,1,1,6,,hedbejo01
