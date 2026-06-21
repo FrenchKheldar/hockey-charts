@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links - Hockey Charts</title>
+    
+    <!-- Google Fonts: EB Garamond (headings) and Lora (body/table data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-light: #fbfbf9; /* Warm off-white paper background */
+            --panel-bg: #ffffff;
+            --panel-border: #e2e8f0;
+            --text-main: #1e293b; /* Dark charcoal */
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Lora', Georgia, serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            padding: 2rem 2rem 1.25rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--panel-border);
+            background: var(--panel-bg);
+        }
+
+        .header-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 0.5rem;
+            color: #ac1d37; /* Vintage dark red */
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        li {
+            border-bottom: 1px dashed #f1f5f9;
+            padding-bottom: 1rem;
+        }
+
+        li:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .link-title {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-title a {
+            color: #ac1d37;
+            text-decoration: none;
+        }
+
+        .link-title a:hover {
+            text-decoration: underline;
+        }
+
+        .link-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .nav-back {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 0.7rem 1.4rem;
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            background: var(--panel-bg);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--panel-border);
+            background: var(--panel-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>Recommended Links / Liens recommandés</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="panel">
+            <h2>Hockey Reference & News</h2>
+            <ul>
+                <li>
+                    <div class="link-title">
+                        <a href="https://www.hockey-reference.com" target="_blank" rel="noopener">Hockey-Reference.com</a>
+                    </div>
+                    <div class="link-desc">
+                        The ultimate source for hockey stats, histories, and player records. This site's raw data is the foundation of our franchise database.
+                    </div>
+                </li>
+                <li>
+                    <div class="link-title">
+                        <a href="https://www.nhl.com" target="_blank" rel="noopener">NHL.com</a>
+                    </div>
+                    <div class="link-desc">
+                        The official website of the National Hockey League. Live scores, news, video highlights, and standings.
+                    </div>
+                </li>
+                <li>
+                    <div class="link-title">
+                        <a href="https://puckpedia.com" target="_blank" rel="noopener">PuckPedia</a>
+                    </div>
+                    <div class="link-desc">
+                        Excellent resource for NHL player contracts, salary cap numbers, and team salary lists.
+                    </div>
+                </li>
+                <li>
+                    <div class="link-title">
+                        <a href="https://www.eliteprospects.com" target="_blank" rel="noopener">Elite Prospects</a>
+                    </div>
+                    <div class="link-desc">
+                        Comprehensive global hockey database detailing player career histories from youth hockey to professional leagues.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-back">
+            <a href="index.html" class="btn-back">← Back to Dashboard / Retour au tableau de bord</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Matthieu Masquelet • <a href="about.html">About / À propos</a> • <a href="links.html">Links / Liens</a> • Made with &hearts; for hockey fans.</p>
+    </footer>
+
+    <!-- GoatCounter Analytics (Privacy-focused, cookie-less) -->
+    <script data-goatcounter="https://frenchkheldar.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

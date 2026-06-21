@@ -132,3 +132,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Allow tracked build output files
+!output/**/*.html
+!output/data.js
+!output/data.json
+!output/CNAME
