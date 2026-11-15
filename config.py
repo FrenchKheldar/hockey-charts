@@ -7,7 +7,7 @@ TEAM_CONFIG = {
     "SEA": {
         "name": "Seattle Kraken",
         "start_year": 2022,
-        "end_year": 2026,
+        "end_year": 2027,
         "colors": ["#99D9D9", "#355C6F", "#001628"]  # Ice Blue -> Boundless Blue -> Deep Sea Blue
     },
     "ATL": {
@@ -19,25 +19,25 @@ TEAM_CONFIG = {
     "TOR": {
         "name": "Toronto Maple Leafs",
         "start_year": 1918,
-        "end_year": 2026,
+        "end_year": 2027,
         "colors": ["#00205B", "#FFFFFF", "#001030"]  # Royal Blue, White, Dark Navy
     },
     "EDM": {
         "name": "Edmonton Oilers",
         "start_year": 1980,
-        "end_year": 2026,
+        "end_year": 2027,
         "colors": ["#041E42", "#FF4C00", "#000B1A"]  # Navy Blue, Orange, Dark Navy
     },
     "BOS": {
         "name": "Boston Bruins",
         "start_year": 1925,
-        "end_year": 2026,
+        "end_year": 2027,
         "colors": ["#FFB81C", "#111111", "#000000"]  # Gold, Black, Dark Black
     },
     "MTL": {
         "name": "Montreal Canadiens",
         "start_year": 1918,
-        "end_year": 2026,
+        "end_year": 2027,
         "colors": ["#AF1E2D", "#192168", "#0B0E2A"]  # Red, Royal Blue, Navy
     }
 }

@@ -627,7 +627,7 @@
                 });
             }
 
-            function getRGBGradientColor(index, numSeasons, colorsHex) {
+            function getRGBGradientColor(index, numSeasons, colorsHex, alpha = 1) {
                 // Parse 3 Hex colors
                 const parseHex = (hex) => {
                     const clean = hex.replace("#", "");
@@ -641,7 +641,7 @@
                 const colors = colorsHex.map(parseHex);
                 const c1 = colors[0], c2 = colors[1], c3 = colors[2];
                 
-                if (numSeasons <= 1) return `rgb(${c1[0]}, ${c1[1]}, ${c1[2]})`;
+                if (numSeasons <= 1) return alpha < 1 ? `rgba(${c1[0]}, ${c1[1]}, ${c1[2]}, ${alpha})` : `rgb(${c1[0]}, ${c1[1]}, ${c1[2]})`;
                 const t = index / (numSeasons - 1);
                 
                 let r, g, b;
@@ -656,7 +656,7 @@
                     g = Math.round(c2[1] + localT * (c3[1] - c2[1]));
                     b = Math.round(c2[2] + localT * (c3[2] - c2[2]));
                 }
-                return `rgb(${r}, ${g}, ${b})`;
+                return alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${alpha})` : `rgb(${r}, ${g}, ${b})`;
             }
 
             function renderDashboard() {
@@ -755,6 +755,9 @@
                     hoverTemplateStr = '<b>%{customdata}</b><br>%{data.name}: %{y:.2f}<extra></extra>';
                 }
 
+                // Determine if this franchise is currently active (any player has Active=1)
+                const isFranchiseActive = rawRows.some(r => r["Active"] === 1);
+
                 // For each season, build a bar trace
                 seasonsList.forEach((season, sIdx) => {
                     const yValues = [];
@@ -766,11 +769,14 @@
                         const val = sRow ? (sRow[currentStat] || 0) : 0;
                         yValues.push(val);
                         
+                        // Fade bars by 20% (alpha 0.8) if the franchise is active and the player is not on the current roster
+                        const alpha = (!isFranchiseActive || leader["Active"]) ? 1 : 0.8;
+
                         // Highlight in Red if it matches the single season record
                         if (val === singleSeasonRecord && singleSeasonRecord > 0) {
-                            markerColors.push(redColor);
+                            markerColors.push(alpha < 1 ? `rgba(228, 24, 46, ${alpha})` : redColor);
                         } else {
-                            markerColors.push(getRGBGradientColor(sIdx, numSeasons, teamData.colors));
+                            markerColors.push(getRGBGradientColor(sIdx, numSeasons, teamData.colors, alpha));
                         }
                     });
                     

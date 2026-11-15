@@ -12,16 +12,17 @@ def hex_to_rgb(hex_str):
     hex_str = hex_str.lstrip('#')
     return [int(hex_str[i:i+2], 16) for i in (0, 2, 4)]
 
-def get_color_spectrum(n, colors, number_bands=15):
+def get_color_spectrum(n, colors, number_bands=15, alpha=1.0):
     """
     Interpolates between three colors to create a gradient spectrum.
     n: index of the current band
     colors: list of three [R, G, B] colors
     number_bands: total number of steps in the gradient
+    alpha: opacity level (default 1.0)
     """
     c1, c2, c3 = colors
     if number_bands <= 1:
-        return f"rgb({c1[0]},{c1[1]},{c1[2]})"
+        return f"rgba({c1[0]},{c1[1]},{c1[2]},{alpha})" if alpha < 1.0 else f"rgb({c1[0]},{c1[1]},{c1[2]})"
 
     t = n / (number_bands - 1)
     
@@ -38,7 +39,7 @@ def get_color_spectrum(n, colors, number_bands=15):
         g = int(c2[1] + local_t * (c3[1] - c2[1]))
         b = int(c2[2] + local_t * (c3[2] - c2[2]))
 
-    return f"rgb({r},{g},{b})"
+    return f"rgba({r},{g},{b},{alpha})" if alpha < 1.0 else f"rgb({r},{g},{b})"
 
 def get_stat(df, p, s, stat):
     """Safely retrieves a player's stat for a given season from the DataFrame."""
@@ -72,6 +73,8 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
         names = top_leaders[display_col].tolist()
     number_seasons = len(seasons)
 
+    is_franchise_active = ('Active' in df.columns) and (df['Active'].max() == 1)
+
     # Add bar trace for each season
     for n, s in enumerate(seasons):
         if s == 'Total':
@@ -79,8 +82,15 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
             
         stats = [get_stat(df, p, s, stat) for p in top_leaders.Player]
         
-        # Color single season records in Red, otherwise use the team color gradient
-        colors = [RED_RGB if st == single_season_record else get_color_spectrum(n, team_colors, number_seasons) for st in stats]
+        # Color single season records in Red, otherwise use the team color gradient (faded by 20% for inactive players on active franchises)
+        colors = []
+        for idx, st in enumerate(stats):
+            is_active = top_leaders.loc[idx, 'Active'] == 1 if 'Active' in top_leaders.columns else True
+            alpha = 1.0 if (not is_franchise_active or is_active) else 0.8
+            if st == single_season_record and single_season_record > 0:
+                colors.append(f"rgba(228,24,46,{alpha})" if alpha < 1.0 else RED_RGB)
+            else:
+                colors.append(get_color_spectrum(n, team_colors, number_seasons, alpha=alpha))
         
         # Build hovertemplate based on stat
         hover_template = '<b>%{customdata}</b><br>%{data.name}: %{y}<extra></extra>'
