@@ -769,8 +769,8 @@
                         const val = sRow ? (sRow[currentStat] || 0) : 0;
                         yValues.push(val);
                         
-                        // Fade bars by 20% (alpha 0.8) if the franchise is active and the player is not on the current roster
-                        const alpha = (!isFranchiseActive || leader["Active"]) ? 1 : 0.8;
+                        // Fade bars by 30% (alpha 0.7) if the franchise is active and the player is not on the current roster
+                        const alpha = (!isFranchiseActive || leader["Active"]) ? 1 : 0.7;
 
                         // Highlight in Red if it matches the single season record
                         if (val === singleSeasonRecord && singleSeasonRecord > 0) {

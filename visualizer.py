@@ -82,11 +82,11 @@ def plot_all_time_leaders(df, stat, stat_name, num, single_season_record, team_n
             
         stats = [get_stat(df, p, s, stat) for p in top_leaders.Player]
         
-        # Color single season records in Red, otherwise use the team color gradient (faded by 20% for inactive players on active franchises)
+        # Color single season records in Red, otherwise use the team color gradient (faded by 30% for inactive players on active franchises)
         colors = []
         for idx, st in enumerate(stats):
             is_active = top_leaders.loc[idx, 'Active'] == 1 if 'Active' in top_leaders.columns else True
-            alpha = 1.0 if (not is_franchise_active or is_active) else 0.8
+            alpha = 1.0 if (not is_franchise_active or is_active) else 0.7
             if st == single_season_record and single_season_record > 0:
                 colors.append(f"rgba(228,24,46,{alpha})" if alpha < 1.0 else RED_RGB)
             else:
