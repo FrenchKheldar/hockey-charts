@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tableau de Bord — Pool de Hockey DISCORD 2026-27</title>
+  <style>
+    :root {
+      --bg-main: #0b1120;
+      --bg-card: #131c31;
+      --bg-card-hover: #1a2642;
+      --bg-header: #0f172a;
+      --border-color: #263554;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-blue: #38bdf8;
+      --accent-gold: #fbbf24;
+      --accent-green: #34d399;
+      --accent-red: #f87171;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #172554 0%, var(--bg-main) 45%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: 3rem;
+    }
+
+    /* Header */
+    header {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 1rem 2rem;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #1e3a8a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+
+    .brand-title h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .brand-title p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .week-selector-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    select.week-select {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select.week-select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1400px;
+      margin: 1.75rem auto 0;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* KPI Summary Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.3rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-blue);
+    }
+
+    .kpi-card.gold::before { background: var(--accent-gold); }
+    .kpi-card.green::before { background: var(--accent-green); }
+    .kpi-card.purple::before { background: #a855f7; }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    /* Section Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.9rem;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    /* Standings Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      padding: 0.75rem 0.9rem;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th:hover {
+      color: #fff;
+    }
+
+    th.num, td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th.center, td.center {
+      text-align: center;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    td {
+      padding: 0.8rem 0.9rem;
+      white-space: nowrap;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-primary);
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: #000; }
+    .rank-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #000; }
+    .rank-3 { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; }
+
+    .delta-rank {
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-left: 0.35rem;
+      display: inline-block;
+      min-width: 28px;
+    }
+
+    .delta-up { color: var(--accent-green); }
+    .delta-down { color: var(--accent-red); }
+    .delta-same { color: var(--text-muted); }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .nhl-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+
+    .nhl-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+    }
+
+    .team-name-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .team-name {
+      font-weight: 700;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .team-nhl-sub {
+      font-size: 0.73rem;
+      color: var(--text-secondary);
+    }
+
+    .pts-strong {
+      font-weight: 800;
+      font-size: 1.02rem;
+      color: #fff;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .pill-pos { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); }
+    .pill-neg { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); }
+    .pill-neutral { background: rgba(148, 163, 184, 0.15); color: var(--text-secondary); }
+
+    /* Filter Chips for Charts */
+    .team-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    .team-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem 0.35rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .team-chip.inactive {
+      opacity: 0.32;
+      filter: grayscale(85%);
+    }
+
+    .team-chip:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .chip-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    .chip-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Charts Grid — 1 seul graphique par rangée (pleine largeur) */
+    .charts-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .svg-chart-wrap {
+      width: 100%;
+      position: relative;
+      height: 440px;
+    }
+
+    svg.chart-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .chart-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.82rem;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+      min-width: 180px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">🏒</div>
+        <div class="brand-title">
+          <h1 id="pool-title">Pool de Hockey DISCORD 2026-27</h1>
+          <p id="pool-subtitle">Suivi hebdomadaire des classements et statistiques • PoolExpert</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="tabs" style="border:none; padding:0;">
+          <button class="tab-btn active" onclick="switchTab('classement', this)">Classement & Évolution</button>
+          <button class="tab-btn" onclick="switchTab('hebdo', this)">Détails par Semaine</button>
+          <button class="tab-btn" onclick="switchTab('repechage', this)">Repêchage (À venir)</button>
+        </div>
+        <span class="week-selector-label">Vue arrêtée à :</span>
+        <select id="week-select" class="week-select" onchange="onWeekChange()"></select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- KPI Row -->
+    <section class="kpi-grid" id="kpi-container"></section>
+
+    <!-- TAB 1: Classement & Évolution -->
+    <div id="tab-classement" class="tab-panel active">
+      <!-- Standings Table -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🏆 Classement Général Cumulatif</div>
+            <div class="card-subtitle" id="table-period-sub">Cliquez sur une colonne pour trier le tableau</div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="standings-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable('rank')">Rang</th>
+                <th onclick="sortTable('name')">Pooler / Équipe LNH</th>
+                <th class="num" onclick="sortTable('cum_gp')" title="Matchs joués cumulatifs">MJ Cumul.</th>
+                <th class="num" onclick="sortTable('cum_pts')" title="Points cumulatifs">Pts Cumul.</th>
+                <th class="num" onclick="sortTable('ppm')" title="Points par match joué (Pts / MJ)">Pts / MJ</th>
+                <th class="num" onclick="sortTable('trail')" title="Points de retard sur le meneur">Retard Meneur</th>
+                <th class="num" onclick="sortTable('gp_vs_avg')" title="Matchs joués comparés à la moyenne de la ligue">MJ vs Moy. Ligue</th>
+                <th class="num" onclick="sortTable('gp_vs_exp')" title="Matchs joués comparés au rythme théorique (20 joueurs × 82 matchs / 27 sem.)">MJ vs Attentes</th>
+                <th class="num" onclick="sortTable('wk_gp')" title="Matchs joués cette semaine">MJ (Sem.)</th>
+                <th class="num" onclick="sortTable('wk_pts')" title="Points marqués cette semaine">Pts (Sem.)</th>
+              </tr>
+            </thead>
+            <tbody id="standings-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Global Team Filters for Charts -->
+      <section class="card">
+        <div class="card-header" style="margin-bottom:0.75rem; padding-bottom:0.6rem;">
+          <div>
+            <div class="card-title">📈 Graphiques d'Évolution Hebdomadaire</div>
+            <div class="card-subtitle">Cliquez sur un joueur ci-dessous pour afficher/masquer sa courbe sur tous les graphiques</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="tab-btn" style="font-size:0.78rem; padding:0.3rem 0.65rem;" onclick="toggleAllTeams(true)">Tout afficher</button>
+            <button class="tab-btn" style="font-size:0.78rem; padding:0.3rem 0.65rem;" onclick="toggleAllTeams(false)">Tout masquer</button>
+          </div>
+        </div>
+        <div class="team-filters" id="team-filters"></div>
+
+        <div class="charts-grid" style="margin-top: 1.25rem;">
+          <div class="card chart-card" style="background: rgba(11,17,32,0.55);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">1. Évolution du Rang (Semaine par Semaine)</div>
+                <div class="card-subtitle">Position au classement général (1er en haut)</div>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="chart-rank"></div>
+          </div>
+
+          <div class="card chart-card" style="background: rgba(11,17,32,0.55);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">2. Points de Retard sur le Meneur</div>
+                <div class="card-subtitle">Écart cumulatif par rapport au 1er rang (0 = meneur)</div>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="chart-trail"></div>
+          </div>
+
+          <div class="card chart-card" style="background: rgba(11,17,32,0.55);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">3. Points par Match Joué (PPM)</div>
+                <div class="card-subtitle">Efficacité cumulative (Points cumulatifs ÷ Matchs joués cumulatifs)</div>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="chart-ppm"></div>
+          </div>
+
+          <div class="card chart-card" style="background: rgba(11,17,32,0.55);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">4. Matchs Joués vs Moyenne de la Ligue</div>
+                <div class="card-subtitle">Avance ou retard de matchs joués par rapport à la moyenne du groupe</div>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="chart-gp-avg"></div>
+          </div>
+
+          <div class="card chart-card" style="background: rgba(11,17,32,0.55);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">5. Points vs Matchs Joués (Nuage / Trajectoire)</div>
+                <div class="card-subtitle">Relation entre le volume de matchs joués (axe X) et les points cumulatifs (axe Y)</div>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="chart-scatter"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 2: Détails par Semaine -->
+    <div id="tab-hebdo" class="tab-panel">
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📅 Historique des Récoltes Hebdomadaires</div>
+            <div class="card-subtitle">Points et matchs joués récoltés individuellement lors de chaque semaine</div>
+          </div>
+        </div>
+        <div class="table-container" id="weekly-matrix-container"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📊 Points Récoltés par Semaine</div>
+            <div class="card-subtitle">Comparaison des performances hebdomadaires (non cumulatif)</div>
+          </div>
+        </div>
+        <div class="svg-chart-wrap" id="chart-weekly-bars" style="height: 420px;"></div>
+      </section>
+    </div>
+
+    <!-- TAB 3: Repêchage -->
+    <div id="tab-repechage" class="tab-panel">
+      <section class="card" style="text-align: center; padding: 3.5rem 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📋🏒</div>
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Module d'Analyse du Repêchage (20 joueurs / équipe)</h2>
+        <p style="color: var(--text-secondary); max-width: 620px; margin: 0 auto 1.25rem;">
+          Cette section accueillera prochainement les analyses du repêchage initial (rendement par ronde, meilleurs vols, gardiens vs patineurs, blessures et points par choix).
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <div id="tooltip" class="chart-tooltip"></div>
+
+  <script>
+    // Données et logos officiels LNH intégrés directement dans le fichier HTML (100% autonome)
+    const POOL_DATA = {
+  "pool_name": "DISCORD 2026-27",
+  "season": "2026-2027",
+  "teams": [
+    {
+      "id": "BRICIUS",
+      "name": "Bricius",
+      "nhl_team": "PHI",
+      "nhl_team_fr": "Flyers de Philadelphie",
+      "color": "#F74902",
+      "secondary_color": "#000000",
+      "line_style": "solid"
+    },
+    {
+      "id": "COCO",
+      "name": "Coco",
+      "nhl_team": "MTL",
+      "nhl_team_fr": "Canadiens de Montréal",
+      "color": "#AF1E2D",
+      "secondary_color": "#192168",
+      "line_style": "solid"
+    },
+    {
+      "id": "FLY_98",
+      "name": "Fly_98",
+      "nhl_team": "PHI",
+      "nhl_team_fr": "Flyers de Philadelphie",
+      "color": "#FF8C42",
+      "secondary_color": "#000000",
+      "line_style": "dashed"
+    },
+    {
+      "id": "KHELDAR",
+      "name": "Kheldar",
+      "nhl_team": "SEA",
+      "nhl_team_fr": "Kraken de Seattle",
+      "color": "#68A2B9",
+      "secondary_color": "#001628",
+      "line_style": "solid"
+    },
+    {
+      "id": "OLIV",
+      "name": "Oliv",
+      "nhl_team": "MTL",
+      "nhl_team_fr": "Canadiens de Montréal",
+      "color": "#3B82F6",
+      "secondary_color": "#AF1E2D",
+      "line_style": "dashed"
+    },
+    {
+      "id": "PENS73",
+      "name": "Pens73",
+      "nhl_team": "PIT",
+      "nhl_team_fr": "Penguins de Pittsburgh",
+      "color": "#FCB514",
+      "secondary_color": "#000000",
+      "line_style": "solid"
+    },
+    {
+      "id": "RAY77",
+      "name": "Ray77",
+      "nhl_team": "MTL",
+      "nhl_team_fr": "Canadiens de Montréal",
+      "color": "#EF4444",
+      "secondary_color": "#FFFFFF",
+      "line_style": "dotted"
+    },
+    {
+      "id": "SHARKDARK",
+      "name": "Sharkdark",
+      "nhl_team": "SJS",
+      "nhl_team_fr": "Sharks de San Jose",
+      "color": "#00A3AD",
+      "secondary_color": "#EA7200",
+      "line_style": "solid"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "label": "Semaine 1",
+      "period": "29 sept. - 4 oct. 2026",
+      "results": {
+        "COCO": {
+          "gp": 52,
+          "pts": 82
+        },
+        "OLIV": {
+          "gp": 43,
+          "pts": 72
+        },
+        "RAY77": {
+          "gp": 45,
+          "pts": 69
+        },
+        "PENS73": {
+          "gp": 42,
+          "pts": 63
+        },
+        "KHELDAR": {
+          "gp": 45,
+          "pts": 57
+        },
+        "BRICIUS": {
+          "gp": 44,
+          "pts": 55
+        },
+        "FLY_98": {
+          "gp": 43,
+          "pts": 52
+        },
+        "SHARKDARK": {
+          "gp": 47,
+          "pts": 47
+        }
+      }
+    },
+    {
+      "week": 2,
+      "label": "Semaine 2",
+      "period": "5 oct. - 11 oct. 2026",
+      "results": {
+        "BRICIUS": {
+          "gp": 64,
+          "pts": 117
+        },
+        "PENS73": {
+          "gp": 55,
+          "pts": 92
+        },
+        "KHELDAR": {
+          "gp": 49,
+          "pts": 80
+        },
+        "RAY77": {
+          "gp": 49,
+          "pts": 78
+        },
+        "OLIV": {
+          "gp": 52,
+          "pts": 65
+        },
+        "SHARKDARK": {
+          "gp": 59,
+          "pts": 65
+        },
+        "COCO": {
+          "gp": 56,
+          "pts": 62
+        },
+        "FLY_98": {
+          "gp": 52,
+          "pts": 56
+        }
+      }
+    },
+    {
+      "week": 3,
+      "label": "Semaine 3",
+      "period": "12 oct. - 18 oct. 2026",
+      "results": {
+        "OLIV": {
+          "gp": 57,
+          "pts": 98
+        },
+        "COCO": {
+          "gp": 55,
+          "pts": 89
+        },
+        "BRICIUS": {
+          "gp": 58,
+          "pts": 86
+        },
+        "SHARKDARK": {
+          "gp": 59,
+          "pts": 85
+        },
+        "KHELDAR": {
+          "gp": 53,
+          "pts": 82
+        },
+        "PENS73": {
+          "gp": 52,
+          "pts": 81
+        },
+        "FLY_98": {
+          "gp": 52,
+          "pts": 76
+        },
+        "RAY77": {
+          "gp": 54,
+          "pts": 74
+        }
+      }
+    },
+    {
+      "week": 4,
+      "label": "Semaine 4",
+      "period": "19 oct. - 25 oct. 2026",
+      "results": {
+        "PENS73": {
+          "gp": 48,
+          "pts": 96
+        },
+        "BRICIUS": {
+          "gp": 57,
+          "pts": 93
+        },
+        "FLY_98": {
+          "gp": 52,
+          "pts": 87
+        },
+        "OLIV": {
+          "gp": 59,
+          "pts": 83
+        },
+        "SHARKDARK": {
+          "gp": 55,
+          "pts": 81
+        },
+        "COCO": {
+          "gp": 53,
+          "pts": 78
+        },
+        "RAY77": {
+          "gp": 45,
+          "pts": 64
+        },
+        "KHELDAR": {
+          "gp": 52,
+          "pts": 62
+        }
+      }
+    },
+    {
+      "week": 5,
+      "label": "Semaine 5",
+      "period": "26 oct. - 1 nov. 2026",
+      "results": {
+        "KHELDAR": {
+          "gp": 49,
+          "pts": 89
+        },
+        "OLIV": {
+          "gp": 51,
+          "pts": 89
+        },
+        "FLY_98": {
+          "gp": 54,
+          "pts": 84
+        },
+        "PENS73": {
+          "gp": 48,
+          "pts": 71
+        },
+        "SHARKDARK": {
+          "gp": 49,
+          "pts": 71
+        },
+        "BRICIUS": {
+          "gp": 54,
+          "pts": 71
+        },
+        "RAY77": {
+          "gp": 46,
+          "pts": 62
+        },
+        "COCO": {
+          "gp": 50,
+          "pts": 55
+        }
+      }
+    },
+    {
+      "week": 6,
+      "label": "Semaine 6",
+      "period": "2 nov. - 8 nov. 2026",
+      "results": {
+        "KHELDAR": {
+          "gp": 58,
+          "pts": 133
+        },
+        "FLY_98": {
+          "gp": 59,
+          "pts": 111
+        },
+        "OLIV": {
+          "gp": 56,
+          "pts": 103
+        },
+        "SHARKDARK": {
+          "gp": 56,
+          "pts": 101
+        },
+        "COCO": {
+          "gp": 61,
+          "pts": 85
+        },
+        "RAY77": {
+          "gp": 49,
+          "pts": 77
+        },
+        "PENS73": {
+          "gp": 58,
+          "pts": 76
+        },
+        "BRICIUS": {
+          "gp": 57,
+          "pts": 59
+        }
+      }
+    },
+    {
+      "week": 7,
+      "label": "Semaine 7",
+      "period": "9 nov. - 15 nov. 2026",
+      "results": {
+        "COCO": {
+          "gp": 57,
+          "pts": 83
+        },
+        "RAY77": {
+          "gp": 46,
+          "pts": 77
+        },
+        "BRICIUS": {
+          "gp": 52,
+          "pts": 66
+        },
+        "SHARKDARK": {
+          "gp": 43,
+          "pts": 63
+        },
+        "PENS73": {
+          "gp": 48,
+          "pts": 61
+        },
+        "KHELDAR": {
+          "gp": 37,
+          "pts": 57
+        },
+        "OLIV": {
+          "gp": 49,
+          "pts": 47
+        },
+        "FLY_98": {
+          "gp": 49,
+          "pts": 47
+        }
+      }
+    }
+  ]
+};
+    const NHL_LOGOS = {
+  "SJS": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNTE5LjMyNiA1MzkuNDYzYy02Ljg5NyAwLTEyLjQ5NyA1LjU5MS0xMi40OTcgMTIuNDk0IDAgNi44OTMgNS42IDEyLjQ5MiAxMi40OTcgMTIuNDkyczEyLjQ4OC01LjU5OSAxMi40ODgtMTIuNDkyYzAtNi45MDMtNS41OTEtMTIuNDk0LTEyLjQ4OC0xMi40OTRtMCAyMi4zMDZhOS44MDQgOS44MDQgMCAwIDEtOS44MTMtOS44MTIgOS44IDkuOCAwIDAgMSA5LjgxMy05LjgwN2M1LjQyMSAwIDkuODEgNC4zODUgOS44MSA5LjgwN3MtNC4zODkgOS44MTItOS44MSA5LjgxMm01LjEzMy0xMi43MDlhNC4yMzUgNC4yMzUgMCAwIDAtNC4yMzktNC4yMzJoLTYuMDJ2MTQuMjZoMi42NzZ2LTUuNzkxaDEuOTIxbDIuNzAzIDUuNzkxaDIuOTU5bC0yLjgyMi02LjAzOWE0LjI0IDQuMjQgMCAwIDAgMi44MjItMy45ODltLTQuMjM5IDEuNTU5aC0zLjM0NHYtMy4xMmgzLjM0NGMuODU5IDAgMS41NjMuNjk5IDEuNTYzIDEuNTYyYTEuNTYgMS41NiAwIDAgMS0xLjU2MyAxLjU1OCIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im03NTkuNTQzIDI2MS4zNzItOC42NTggMTUuNDEzIDEuNDI3IDguOTU2Yy0yMi45MSA0NC44Ny00Ny44OTcgODYuNTEzLTU2Ljg0NyAxMDEuMTY3LTMuNDY5LTcuODY2LTguMDQzLTEyLjUxMy0xNi44OTQtMTcuMjQ3IDAgMCA0MC42NTUtNzMuNzY3IDUxLjY0OS0xMzIuMjY5LTMwLjc1IDE1LjIyOS02Mi45NiAzMC4yOTMtNjIuOTYgMzAuMjkzbDU1LjA5NC04OS4xMzFzLTEwNS45NDMgMjMuMTc1LTE4OS43NTYgMzEuNTM2QzQ0Mi4yNDYgNzYuOTc5IDM2MC4wOTUgNTMuNSAzNjAuMDk1IDUzLjVzNTYuOSA5My4xNzIgNjcuNDc5IDE1OC4zMThjLTExNS4yMjUtMTAuODE3LTIwOS4xOTItMzMuMjY0LTIwOS4xOTItMzMuMjY0bDEwMC4zMjUgMTYyLjI3OWMtNTguNzA1IDMuNDg0LTE1Ny40NzIgNi42NzktMTU3LjQ3MiA2LjY3OSAyNS4xNzYgMjUuMTczIDEwNi4xNTggNTcuMDg0IDIxMy4yNTggODMuNTQ0bDE5LjExIDMwLjkyOWMtNjIuOTg4IDQ3LjQ3OC0xMDAuOTU3IDExMi44NS0xMDAuOTU3IDExMi44NWw2LjM2NCAxMS42NjVzMzEuMjYxLTEuODY5IDY5LjYwNi0zLjIzNWMwIDAgMTAuNDM3LTMzLjY5NSA1My4zNDktNzUuMzk4bDQ4LjQxMSA3OC4zMTMgNjAuNzExLTk4LjIgNi42MS0uNzY2IDMuNjY5IDIuMjAzYy0xLjAwNCAxLjAwMi0xLjY4IDIuOTM4LTMuMTIzIDUuMjQyIDUuMDM3IDMuNDI1IDUuMTgyIDMuOTk1IDUuNDIzIDEwLjA5MiAwIDAgNi43MDYgMi4zNjIgMTQuOTkyLS4zNTdsMi4zMDctNC4xNjEgMi44MjMgMS4yNzZjLjM1MyAyLjk1IDEuMTcyIDYuMTYyIDEuMTcyIDYuMTYyIDcuNzIzIDMuNjMzIDE0LjI2LTEuMTkzIDE0LjI2LTEuMTkzIDIwLjYxNyA0LjIzOSAzNC41NjQgMS44MjIgMzkuMTg1LjcgMjAuNCA1LjYxNiAzMy42MDcgMS44MTcgMzkuMDgtLjU1OCA5LjM3OSAzLjg3NyAxOS4wOTYgNi4zOTQgNDYuMDIgNi4zOTQgMTIuNDE0IDAgMjUuNjQtLjc2NiAyNS42NC0xMC4wMjcgMC0xMy4wMDEtMTIuNDI3LTYwLjcyOS0yNS4wMzMtODcuMTQgMCAwIDkuMjU1IDYuNTEzIDE3LjU2IDguMTc0bDExLjUyOC04LjM0MWMtNS4yMzYtNi4xNTUtNC4yNDEtNy45NTQtMy41NDEtMTIuNzIzLTQuMTExLTMuNDg0LTkuODY2LTQuMjkyLTkuODY2LTQuMjkyIDExLjI3LTEyLjkzOCAzNC44MTQtNDMuMTE5IDYyLjk1OS05Ny4xMzcgNS45MTgtLjg5NiAxMy41LTQuMzcyIDE0LjQxLTEzLjY5MiAxLjAwMy0xMC4xNDggMS42MDMtMTQuNTIzIDEuNjAzLTI0LjE2Ni0xNy44MTgtOC4xNi0zOS4yMjItMi4yOTktMzkuMjIyLTIuMjk5eiIvPjxwYXRoIGZpbGw9IiMwMTAxMDEiIGQ9Im02ODkuODE3IDIwMS40MzUtNTAuODU0IDgxLjIzNWEyNzUyIDI3NTIgMCAwIDEgMTcuMjctNy45MjFsNTQuMjctODcuNzg3cy05Mi4zMiAyMC4xNjYtMTc2LjM1NCAyOC42ODZjMiAzLjExNyAzLjk1NiA2LjI1NSA1Ljg5NSA5LjQzNiA1Ny43MDEtNi4wOSAxMTcuOTA1LTE3LjI2OCAxNDkuNzczLTIzLjY0OSIvPjxwYXRoIGZpbGw9IiMwMTAxMDEiIGQ9Ik02OTcuOTQ0IDQxNi4xMTRjLTcuMDIzLTI5LjIwNi04LjE2OC0zNC41MzktMjMuNjc3LTQyLjM4NGwtMi41Ny0zLjI5MmMyOC41OS01MS4xOTYgNDkuMjg2LTExMi4yODkgNDkuMjg2LTExOS42MDEgMC0xLjc3Mi0uODE5LTIuMjk3LTEuODg0LTEuNzQ0LTQ1LjQ4NSAyMy4wNTktOTUuNDM3IDQzLjYzMi0xMDYuNDg0IDUxLjM0OWwtMi45NjMgNC4wOTRjLTI0LjQ1OC0yMS43OTQtNDUuNDQtMzcuMTE4LTUzLjU1OC00Mi44MjktNTAuODQ4LTk5Ljc3LTEyOC44NTUtMTY5LjktMTc5LjExLTE5NS4wMiAwIDEwLjQxOSA0OS43NDIgODYuOTkzIDU3LjM2NCAxNTEuMzM4LTg5Ljk3OC02LjEzMy0yMDQuMTA1LTMxLjA2My0yMDQuMTA1LTMxLjA2M2w5OC4yNjUgMTU4Ljk2NGMtODAuNyA0Ljk0NS0xNTEuNDk3IDYuNjE1LTE1MS40OTcgNi42MTUgMCA1LjYxMSA5MC4xMTcgNDguNzAzIDIyMy4xNjYgNzguNzkzIDI5LjA5NSA2LjU5NiA1MC43NjkgNS41NSA2NC45MzkgNS41NWE1NDYgNTQ2IDAgMCAwLTcuOTI5LTguNTI0YzE5LjI4OCAxMS43NiAzNi44NzcgMjMuNDg0IDUyLjcxNiAzNC4wMjEtMy45NzQuMDU0LTguMzA1LjA3Mi0xMy4wNzguMDcyLTMxLjk5MSAwLTU2LjE3Ni0xLjY2OC03MS40ODYtMi44Mi0zLjc5My0uMjkyLTcuMDYxLS41MzUtOS43MzktLjcyNS0xLjM1OS0uMDgzLTIuNTU1LS4xNDgtMy42MTgtLjIwOGwtMTUuMDUyLTI0LjA0MmMtNi4wNjktMS4zNC0xMS44NzItMi43NTUtMTUuODc3LTMuNzMzbDIwLjExMyAzMi41MTljLTE4Ljc4NiAxMy41MTEtNjcuMDI1IDU0LjQ2MS0xMDEuOTY2IDExMS41MzhsMy4wNTQgNS42MzRzMzMuNzYtMi4wOTUgNjIuMjk5LTIuOTAyYzAgMCAxMi43OTktMzYuNTA5IDU4LjU2OS03OC43NTJsNDcuMjU0IDc2LjQwNyA1Ny4zMjItOTIuNzI2YTg3MSA4NzEgMCAwIDAgMTEuMjk5LTEuM2MzLjk2OSAyLjQ4NiA3Ljc5OCA0LjgyIDExLjQ0NiA2LjkyMS0xLjk1OSAxLjE2OS0zLjYwNyAyLjY3Mi00Ljg3NCA0LjkyMiAwIDAgMy4zIDIuMjYxIDMuNTE0IDYuNzEzIDAgMCAyLjgzNC40NTcgNS43OTQtLjM3OSAwIDAgMi4wMTgtMy4wNjQgMy43NjctNi43NjIgMy43NTggMS45MTggNy4yOTIgMy41ODUgMTAuNjA1IDQuOTA5LS4wMyAzLjIuNTA4IDUuNTY5LjUwOCA1LjU2OXMzLjY2IDEuMTE2IDguMDU1LTIuODAyYzI1LjQwOCA1Ljc4OCA0MC41OTEuODc5IDQwLjU5MS44NzkgMjUuNzg3IDcuNjM0IDM4Ljg5OC0uOTAzIDM4Ljg5OC0uOTAzIDEwLjEgNC4zOTMgMTguNTQ1IDYuOTI4IDQ2LjIwNSA2LjkyOCAxNS4wMTEgMCAxOS45NjgtMS44MjMgMTkuOTY4LTQuMzUxIDAtMTIuMDY0LTEyLjc3Mi02MS40NjYtMjUuNTMtODYuODc0ek00NzAuMzc1IDUzMS4wMjVsLTI3LjAxLTQyLjgxM2MxMC40OC0uMTkxIDMwLjQ0MS0uODE0IDU1LjgwOC0yLjg1NnoiLz48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJtNzA1LjM4OCA0MDcuMTMxLjkxNyAzLjM2N3M4LjI3NiA1LjY0NiAxNC4yNTQgNy4zMTNsNC43NzUtMy40NDNzLTIuNzQ4LTMuNTE0LTEuODg1LTguNjY1Yy02LjIxMi00LjAyOC0xOC4wNjEgMS40MjgtMTguMDYxIDEuNDI4bTU3Ljg5Mi0xNDAuODI5LTYuNDcxIDExLjUzNCAxLjQxIDguODI1Yy0yOS4wMzcgNTcuMTE3LTYxLjM2NyAxMDguODExLTYxLjM2NyAxMDguODExbDMuOTkyIDkuNjk2IDQuNzI4LTMuMjc5IDMuMjMuMjgyczMwLjk1Mi0yOS42MDIgNzAuMzg3LTEwNi4wMzljMCAwIDExLjQxLjM4MyAxMi4zNDUtOC44NjkuOTIzLTkuMzU2IDEuNTY4LTE1Ljg1OSAxLjU2OC0xOS42MDUtMTQuMjAzLTUuMTYyLTI5LjgyMi0xLjM1Ny0yOS44MjItMS4zNTd6Ii8+PHBhdGggZmlsbD0iI2U1NzIwMCIgZD0iTTQzNC40MDcgNDg5LjAwMWMtLjc3MS42NDEtMS40NzMgMS4yOTQtMi4yMjkgMS45NDdsMzguMTk3IDYxLjAwOCA0Mi40MjgtNjcuNzg4Yy0xLjIyMy4xMjUtMi40NjQuMjMyLTMuNjc1LjMzM2wtMzguNzUzIDYxLjk1OHpNNjgzLjU2IDIwNS43NTZsLTQ5LjYwNSA3OS4yNTRjMS42NDUtLjc3MiAzLjMwNy0xLjUzNCA1LjAwOC0yLjMzOWw1MC44NTQtODEuMjM2Yy0zMS44NjcgNi4zODEtOTIuMDcxIDE3LjU1OS0xNDkuNzczIDIzLjY1LjU3Ny45NDkgMS4xNDQgMS45MDkgMS43MiAyLjg2MSA1NC4zMTUtNS44NTQgMTEwLjQzOC0xNi4wNTUgMTQxLjc5Ni0yMi4xOU00MTUuNjAxIDQ1OC45MDlsLTE0LjYzNy0yMy4zNjZjLTEuMzM4LS4yOTEtMi42OTItLjU3Ni00LjAzMy0uODg0bDE1LjA1MSAyNC4wNDJjMS4wNjMuMDU5IDIuMjU5LjEyNCAzLjYxOS4yMDhtMTM1LjQzMiAzOC43MzVjMy45MTUtNS4yODQgNi41NzItOC42NTUgNy4yMDEtMTAuNzc0LTMuNDU1IDEuNTAxLTcuODggMi4zMjYtMTAuMjkxIDUuOTk2IDAgMCAxLjc2MSAxLjcxNSAzLjA5IDQuNzc4bTIwLjEyNCAzLjYyN3MyLjYxMy0uMzM5IDQuODk4LTIuNjNjMCAwLTIuNDI1LTMuNzUxLTMuODczLTcuMjQyLTEuNzIyIDQuMzg3LTEuMDI0IDkuODcyLTEuMDI0IDkuODcyem0tMTIuMDY4LTkyLjUwMWMyLjA5IDE2LjYzNCA2LjA4NCAyMy42ODcgNi4wODQgMjMuNjg3czYuMjcgNC45MDggMTguMjA3IDkuNzk0Yy0xMi4wNTYtMjIuMzAzLTI0LjI5MS0zMy40ODEtMjQuMjkxLTMzLjQ4MU00MjguNSA0ODIuOTkzbDQuODAzLTIuNjg5czE5LjcyNCAzLjE4MSAxMzcuOTE4LTkuMDExYy0yLjgxNS0yLjA0OS00LjIxLTEuNjQ1LTQuMjEtNi4zNDYgMC0xLjUwMy4yNTUtMS43NTItMi4zMjEtMS43NTItMi41NzEgMC0zLjY3NS0uNjgzLTYuNzE3LS42ODMtMy43OSAwLTkuNDQ0IDMuOC02Ny4zNTggMy44LTQ2LjA4IDAtNzguMzY5LTMuODcxLTgwLjUtMy44NzEtMi4xMDQgMC02LjI1NCAzLjk0OC0xOC41OTYgMTMuODczIDAgMCAyNC4yNjktLjMxNCAzNi45ODEgNi42OHptLTYwLjI0NSA3NC4wMzljLTE3Ljc1OS0zLjM5Ni01NC40MzQgMi43MzYtNTQuNDM0IDIuNzM2bC05LjgyOCAxNC4xNyA1Ny40MDUtMi42OTR6bTM5NC45MDQtMjcyLjQwNWMtMTkuMTkzIDM0LjQ2Ny00MC4wNzEgODAuMTUzLTYyLjkxMSAxMDguNDE0bDYuNTgzLTQuMTI2IDEuNDQyLTEuNDI4LTEuMTkgMy44NzYgMi43OS0xLjMyNi00LjE5NyA3LjM5NiAzLjkxLTMuMTM3czE5LjUzNi0yMS45NyA2OC45NDItMTExLjIxNWMtMTAuOTg4LTEuNjY2LTE1LjM2OSAxLjU0Ni0xNS4zNjkgMS41NDZtMi4wMTgtMTMuMzg5LTQuMDA0IDYuMzMzczkuNjczLTEuODQ1IDIyLjU0Ni0uNzY5bDQuNjYtNi41NjVjLTE0LjE3OS0yLjY3NS0yMy4yMDIgMS0yMy4yMDIgMXoiLz48cGF0aCBmaWxsPSIjZTU3MjAwIiBkPSJNNzA0LjIzNCAzOTMuNjk0cy0xLjgyNiAxLjQ4MS00LjY2NCAyLjI3MWwyLjQxIDUuMTA1IDEuNDg4LTEuMTQ5LS41OTQtMS44MzcgMi40ODItNC43Mjl6bTE3LjEzNSAxMy4yNDdjLTQuMDE2LTIuMDg5LTExLjgzNyAxLjAwNS0xMS44MzcgMS4wMDVzNy45MzcgMS44NTggMTIuNDIxIDMuOWMwIDAtLjc5NS0xLjgyOC0uNTg0LTQuOTA1Ii8+PHBhdGggZmlsbD0iIzAwNzc4YiIgZD0iTTQxNS42MDEgNDU4LjkxYzIuNjc3LjE4OSA1Ljk0NS40MzMgOS43MzguNzI0bC0xMy44OTctMjIuMDNjLTMuMjM2LS41NTgtNi44MTUtMS4yODgtMTAuNDc4LTIuMDZ6bTI3Ljc2NCAyOS4zMDJjLTUuMjUxLjA4My04LjEzNS4wNzctOC4xMzUuMDc3LS4yOTIuMjM3LS41NDQuNDgxLS44MjMuNzEybDM1Ljk2OSA1Ny40NTkgMzguNzUyLTYxLjk1OGMtMy40MDcuMzItNi43MTQuNjE2LTkuOTU1Ljg1NGwtMjguNzk4IDQ1LjY2OXptMjI2LjAzMy0yNzIuNzY0LTQ3LjUzNCA3NS4zODljMy41NzYtMS43ODcgNy42ODEtMy43NTIgMTIuMDkyLTUuODI2bDQ5LjYwNC03OS4yNTRjLTMxLjM1OSA2LjEzNS04Ny40ODEgMTYuMzM2LTE0MS43OTYgMjIuMTlhMzYyIDM2MiAwIDAgMSAzLjg1NiA2LjQ4NWM0NC42MzItNC45MTggOTAuMzU0LTEyLjY5MiAxMjMuNzc5LTE4Ljk4NHptLTIzNC4wNDQgMTguMjkzYzAtMy41MTQtLjE2LTcuMDY3LS40NzgtMTAuNjc3LTMwLjkxNyAzLjI3Mi00OS4zNDQgMTAuNTczLTU2LjQyMyAxMy44ODggMTAuODQ5LTMuMDI0IDMwLjA5OC0zLjk1MSA1Ni45MDEtMy4yMTFtMjM0Ljk0OCAxNDIuNTQxcy0zNy42MDctNTIuNzg1LTEwOS45MjUtMTA2LjA0MWM2LjE0NSAxMi43MDkgMTEuODY0IDI1LjgzOCAxNy4wMSAzOS4zOTcuNzMgMS45MDUuNjIyIDMuNTY4LTEuMDAyIDMuNTY4LTE1Ljg0IDAtNzEuNzYtMzAuNzU2LTEyNi42OTItMjUuMjQ2IDI4LjUzIDI3LjE2OSA1Ni44OTQgNjUuMjkzIDI5LjM5MiA1MS4zOTMgMCAwIDI4LjcxNyAxNy43MjIgNjIuNDQ0IDUzLjI2NCAyNS4xMjYgMCAzMC4xMjIgNC4yMzkgMzEuNTk5IDcuNzUyIDIuODYyIDYuNzgzIDcuMDI2IDE4LjgzMiAyMy40NzYgMzguMjMyIDcuNTUgMCA4LjkzMi0uNDkzIDExLjY5Ny03LjI3OCAwIDAgMi4wNTcgOC42NjEtMS43MjQgMTUuMDE0IDM0LjI4NiAyNy4wODggMTAwLjg1OSA1NC4zNzcgMTExLjAzNyA1NC4zNzcgNC4wOTcgMC00LjM0LTM3LjI1Ny0yMy42Mi04Mi4wNTktNi4zLTI4LjM3OC05Ljc3NS0zNi4zMzItMjMuNjkyLTQyLjM3M1ptLTMxMi41MDEtMzIuMjYzczkuODA3IDUuNzY5IDI1LjkwOSAxNy45MjJjLTMuOTUzLTYuODQyLTE0LjM4My0xNC4yODktMjUuODAyLTIxLjIybC0yNS4wNTggMS44MzcgMS44NDkgMi45OTFjNy42NTUtLjQ4OCAxNS4zNTctMS4wMDggMjMuMTAyLTEuNTMxem0xNDcuNTcyIDQzLjg4N2MtMy45NjggMjEuNDQxLjE4NCAzOC42NTEuMTg0IDM4LjY1MS0uNjc5LTcuMTY2IDQuOTctMzEuMTk4IDQuOTctMzEuMTk4em0tMTIuNTktMTIuMjRjLTMuOTUxIDI0LjYwMyAxLjYxNSA0NC4yMyAxLjYxNSA0NC4yMy0xLjE4OC05LjA0MSAzLjUyOC0zNS42NjQgMy41MjgtMzUuNjY0em0tMTIuNDU4LTExLjEzMmMtNC4wNzUgMjYuMjk2IDIuMjc3IDQ3LjI5NCAyLjI3NyA0Ny4yOTQtMS4xODItMTEuOTYzIDIuODc2LTM5LjgzOCAyLjg3Ni0zOS44Mzh6bS0yOC4zNDMtNDMuMzkycy00OC4zNTUtNDAuMDE0LTEwOC4zODQtNTAuMDkxYy0yLjE3IDAtNi41MSA5LjEyNC02LjUxIDkuMTI0czYuMzU2LTUuNzMxIDguMjg4LTUuNzMxYzUxLjQwNiA5Ljg5NSAxMDYuNjA2IDQ2LjY5OCAxMDYuNjA2IDQ2LjY5OCIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik01ODkuODE4IDQ5Mi4zNjFjNy4wMDMtNC4xNDkgMTIuMTM0LTguMDk2IDEyLjEzNC04LjA5Ni0yMy4wOTMgMS4wMDgtMzEuNzk2LTEuODA2LTMxLjc5Ni0xLjgwNiA0LjEzMy00LjEyNSA5LjI5NS03LjY4MSAxMi41NjMtMTAuOTQ2LTIuNDg4LjM5Mi01LjA0NC42NjUtNy41NC44NzgtLjAzIDEuMTIzLTEuMjYyIDIuMzk5LTQuNzg0IDQuNTM2YTc4OCA3ODggMCAwIDEtMjAuNDA0IDMuMDFjMS44OTcgMi4wMTggMy45MjEgMy45ODMgNi4xNjggNS44NDggMS41NjQtLjUxMiAzLjIzMi0xLjAxNiA1LjAxNC0xLjYyMSAwIDEuNDEyLS4zNzcgMy4wNDUtLjkxOCA0LjY3OGE1MSA1MSAwIDAgMCA5LjMzMiA0Ljk5MmMuMzYyLTIuMjYyIDEuMDQyLTQuNjI1IDIuNDEzLTYuNzYyIDEuMTcuMzI3IDEuODA1IDMuNzQ2IDIuNDYxIDQuNjg0IDEuNzEzIDIuNTA2IDMuOTYzIDIuOTE1IDQuMzgxIDQuOTggOS42ODIgMi4yMjcgMjEuOTY1IDIuODQ0IDM4LjE2Mi44MDhsNC40OTQtMy42NDRjLTIzLjY5OC40MjctMzEuNjgtMS41MzgtMzEuNjgtMS41Mzh6bS0zOC4zODEtMzQuNzMzYy0xMC4zNTYgMy4zMDYtMTQuODA2Ljk5MS0xNC44MDYuOTkxIDIuMDMtMi4wMjQgMy4zNDMtNS45OTYgMy4zNDMtNS45OTYtOS4xNjYgMi41NTktMTIuMDA5LjAxMi0xMi4wMDkuMDEyIDEuNDU0LS44NzggMi45MjMtNC4zOTMgMi45MjMtNC4zOTMtMTEuODk3IDAtMTguMzk3IDEuOTYtMTguMzk3IDEuOTYgOS44ODEgMS4yNDEgMTYuMzU1IDUuNTggMjEuODU1IDExLjE4OSA3Ljc1LS41NTIgMTIuNDkzLTEuMjQ2IDE1LjgxNS0xLjc4N3oiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNTMxLjM4NyA0NTEuNjI3czUuMDE5LjMwMiAxMC44MzQtMS43N2MwIDAgLjMwOCAzLjg5NS0yLjMyNSA3LjM5MSAwIDAgNC45MTktLjAzNSAxNS4wMjgtMi4zNzQgMCAwLS44NzIgMi4wMTgtMi4wOTMgNC4yNzMgMS44MjktLjMwMiAzLjIwNy0uNDk4IDQuNjU4LS40OTggMy4yNSAwIDMuNjM5LjY4MyA2LjQ5MS42ODMgNS4zNzkgMCA2LjA0MSAxLjExNiA2LjgzNiA3LjM3OSAxLjA4OSAxLjU5NyAyLjM1MSAyLjY3OCAzLjIxMSAzLjYwOSAzLjk4MS0uMzA4IDguNTY3LS43NDIgMTMuMTc5LTEuMzk1IDAgMC01LjEzMiA3LjEyNC0xMi44NzUgMTIuMzcxIDAgMCAyMS40ODkgMi4wMjUgMzIuNjE5LjYzIDAgMC00LjgwNSA1Ljg2NS0xMS40MTUgOS4yMzYgMCAwIDE0Ljg1My45NSAzMC44MDYuNjc4IDAgMC0zLjEzMSAzLjQ2MS02LjI1IDUuOTc3IDAgMCAxOS43MTQgNC40NDggMzMuNzM3IDEuMTExLTUwLjY0NC0yMC4xNDMtNzguNTE2LTUwLjYzMi0xMjAuOTAyLTUwLjYzMi0uNjI4IDEuNzg3LTEuNTM5IDMuMzMxLTEuNTM5IDMuMzMxTTMyNy4wNyA1NDIuNzkybC0xMS4zOTEgMTQuNTg2czMzLjQ5My01LjIyNSA1My41NzktMi4xNzRsNS41NzYtOS41NjNjLTEwLjk1MS01LjY3NS00Ny43NjMtMi44NDktNDcuNzYzLTIuODQ5eiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0zMzIuMjc3IDUzNi4yNjEtMy41MjkgNC40MjJzMzQuNTc2LTIuNjI5IDQ3LjE5MSAzLjJsOC4yMDQtMTIuMzQ3Yy0xMS4xNzgtMS44MTEtNTEuODY2IDQuNzI1LTUxLjg2NiA0LjcyNW01Ljk4Ni03LjMyNS00LjAyNCA0Ljg4NXM0MS40MTItNi40NTMgNTEuMjA3LTQuMDczbC43MjctLjk5N2MtMTAuMjUyLTMuMzc3LTQ3LjkwOS4xODQtNDcuOTA5LjE4NHptMTMuOTUxLTE2LjAyOS0xMi4wNzcgMTMuNzY3czMzLjU3MS0zLjQ4NiA0Ny4zNTEuMzg1bDEzLjkyNS0xNi4wODdjLTE0LjE0MS0yLjMyNy00OS4xOTkgMS45MzUtNDkuMTk5IDEuOTM1bTE4LjAxMS0xOC4xMTItMTUuOTEyIDE1Ljc5czI5LjM1NS0zLjk3NiA0OC43MTYtMS40MzZsNy42MTEtOC40MDZjLTcuMjUxLTYuMTg1LTQwLjQxNS01Ljk0OC00MC40MTUtNS45NDgiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMzczLjI0NCA0OTIuMDQxLS44MzQuNzU0czI4LjYzNC0uNDQgMzkuNjIyIDYuNDIzbDEuNjUxLTEuNzM5Yy04Ljg4NC01LjA0Ny00MC40MzktNS40MzgtNDAuNDM5LTUuNDM4bTE1LjgyMy0xMy42NzgtMTMuNjcxIDExLjc0M3MzMS44OTcuNTgxIDM5LjcyNiA1Ljg0NmwxMS43NTQtMTEuNTkyYy0xMC4zMzItNS44NjYtMzcuODA5LTUuOTk3LTM3LjgwOS01Ljk5N20tMTguMjg0IDc4LjEyMy40MzMgMi44OTIgNC41NjktOC4wMi0uNDQ1LTIuNzc0em02LjA4NS0xMC40NDIuNDY5IDIuNzczIDcuNjg4LTExLjIzMi0uNTAyLTMuMTd6bTkuMjQ5LTEzLjg4NC41NDEgMy4zMTIuNzM5LS45NS0uNjM2LTMuMjQ4em0yLjIyMy0yLjk3NS42NSAzLjM3MiAxMy4wNzUtMTQuNzE2LS41NDktNC4wMTR6bTE0Ljg3MS0xNy4yNjMuNTczIDQuMDQzIDcuOTAzLTguNDQ4LS45OTktMy44NjR6bTkuMDUtOS45NzkgMS4wMDkgMy45MTEgMS41MzgtMS42MDItLjU0Ni00LjQ4MnptMy43MTktMy45ODkuNTY0IDQuNTM1IDEwLjM4NS0xMC4xODctLjEyNy01LjI3N3oiLz48L3N2Zz4=",
+  "PHI": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNDQ1LjIwMSA0MzQuOTE0Yy02Ljg0OSAwLTEyLjQxMSA1LjU1Mi0xMi40MTEgMTIuNDA2IDAgNi44NDcgNS41NjIgMTIuNDA4IDEyLjQxMSAxMi40MDhzMTIuNDAyLTUuNTYxIDEyLjQwMi0xMi40MDdjMC02Ljg1NS01LjU1Mi0xMi40MDctMTIuNDAyLTEyLjQwN20wIDIyLjE1MWE5LjczIDkuNzMgMCAwIDEtOS4wMDUtNi4wMTQgOS43IDkuNyAwIDAgMS0uNzQtMy43MyA5LjczMyA5LjczMyAwIDAgMSA5Ljc0NS05LjczOWM1LjM4NCAwIDkuNzQzIDQuMzU0IDkuNzQzIDkuNzM5cy00LjM1OSA5Ljc0NC05Ljc0MyA5Ljc0NG01LjA5OC0xMi42MjFhNC4yMTggNC4yMTggMCAwIDAtMS4yMzQtMi45NzQgNC4yIDQuMiAwIDAgMC0yLjk3Ni0xLjIyOWgtNS45Nzh2MTQuMTYyaDIuNjU3di01Ljc1MmgxLjkwOGwyLjY4NCA1Ljc1MmgyLjkzOWwtMi44MDMtNS45OTdhNC4yMSA0LjIxIDAgMCAwIDIuODA0LTMuOTYyem0tNC4yMSAxLjU0OGgtMy4zMjF2LTMuMDk5aDMuMzIxYy44NTQgMCAxLjU1My42OTUgMS41NTMgMS41NTJhMS41NTQgMS41NTQgMCAwIDEtMS41NTMgMS41NDciLz48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNTgyLjczOCAxMjEuNDk5SDE5Ni44NTV2MTguMjEzYzAgMjguMTk0IDExLjAyIDU0LjY3MyAyOS44NzggNzMuODcyaC0yOS44Nzh2MTguMjE3YzAgMjguMTg3IDExLjAyIDU0LjY3IDI5Ljg3OCA3My44NTdoLTI5Ljg3OHYxOC4yMjFjMCAyOC4xODEgMTEuMDIgNTQuNjYxIDI5Ljg3OCA3My44NjloLTI5Ljg3OHYxOC4yMTVjMCA1Ni41MzggNDMuMjggMTAyLjUzOCA5Ni40ODQgMTAyLjUzOGg4OS40ODlsNjAuNzM5LTEwMi42ODZjMzQuMTcgNDEuNjYgODUuMzkzIDY2LjQ5MiAxMzkuMTcxIDY2LjQ5MiA5OS40NzUgMCAxODAuNDA3LTgwLjkyMyAxODAuNDA3LTE4MC4zOThzLTgwLjkzMi0xODAuNDEtMTgwLjQwNy0xODAuNDEiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNTgyLjczOCAxMjcuNzA2aC0zNzkuNjh2MTIuMDA2YzAgMzMuMzUzIDE1Ljk3MSA2Mi43NzYgNDAuMTY0IDgwLjA3NWgtNDAuMTYzdjEyLjAxNWMwIDMzLjM0MSAxNS45NzEgNjIuNzU5IDQwLjE2MyA4MC4wNjNoLTQwLjE2M3YxMi4wMTVjMCAzMy4zNDIgMTUuOTcxIDYyLjc1OSA0MC4xNjMgODAuMDYyaC00MC4xNjN2MTIuMDIxYzAgNTMuMTEzIDQwLjQ5OSA5Ni4zMjggOTAuMjggOTYuMzI4aDg1Ljk1Mmw2My40MDgtMTA3LjE5N2MzMi44MTcgNDQuNDU2IDg0LjY1MiA3MS4wMSAxNDAuMDM5IDcxLjAxIDk2LjA1MyAwIDE3NC4xOTktNzguMTQ1IDE3NC4xOTktMTc0LjE5NXMtNzguMTQ2LTE3NC4yMDMtMTc0LjE5OS0xNzQuMjAzIi8+PHBhdGggZmlsbD0iIzAxMDEwMSIgZD0iTTU4Mi43MzggMTM5LjcxM2gtMzY0LjJjMCA0Ni41NzYgMzUuMDQzIDg0LjMyOCA3OC4yNzMgODQuMzI4aDEzNy4xOTFjMi4xMzYgMCAzLjg3MyAxLjczNyAzLjg3MyAzLjg3OHMtMS43MzcgMy44ODMtMy44NzMgMy44ODNIMjE4LjUzOWMwIDQ2LjU2OSAzNS4wNDIgODQuMzIgNzguMjcyIDg0LjMyaDgyLjcyNWEzLjg4NSAzLjg4NSAwIDAgMSAzLjg4IDMuODg2IDMuODg1IDMuODg1IDAgMCAxLTMuODc5IDMuODcySDIxOC41MzhjMCA0Ni41NjcgMzUuMDQyIDg0LjMyIDc4LjI3MiA4NC4zMmgyOC4yNmEzLjg4IDMuODggMCAwIDEgMy44NzYgMy44NzkgMy44ODMgMy44ODMgMCAwIDEtMy44NzYgMy44ODRIMjE4LjUzOGMwIDQ2LjU2MSAzNS4wNDIgODQuMzE4IDc4LjI3MiA4NC4zMThoNzUuNjM1bDE0MS4zODctMjM5LjA0OGMxMy45MjgtMjMuNTQzIDM5LjU2Ny0zOS4zMzMgNjguOTA1LTM5LjMzMyA0NC4xODYgMCA4MC4wMDcgMzUuODIgODAuMDA3IDgwLjAxcy0zNS44MjEgODAuMDA2LTgwLjAwNyA4MC4wMDZjLTQzLjYzMiAwLTc5LjEwMy0zNC45MzQtNzkuOTg4LTc4LjM1OGwtNTMuNSA5MC40NjVjMjkuMjYzIDQyLjMyNCA3OC4xMyA3MC4wNzMgMTMzLjQ4OSA3MC4wNzMgODkuNTczIDAgMTYyLjE4OC03Mi42MTkgMTYyLjE4OC0xNjIuMTg2cy03Mi42MTUtMTYyLjE5Ny0xNjIuMTg4LTE2Mi4xOTciLz48cGF0aCBmaWxsPSIjZGM0NDA1IiBkPSJNNTgyLjczOCAyNTUuODc4Yy0yNS40MjEgMC00Ni4wMjMgMjAuNjA4LTQ2LjAyMyA0Ni4wMzFzMjAuNjAyIDQ2LjAyMSA0Ni4wMjMgNDYuMDIxIDQ2LjAyOS0yMC42MDkgNDYuMDI5LTQ2LjAyMS0yMC42MDQtNDYuMDMxLTQ2LjAyOS00Ni4wMzEiLz48L3N2Zz4=",
+  "PIT": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNTE5LjA4NyA1MjEuNDVjLTYuODU3IDAtMTIuNDIzIDUuNTU3LTEyLjQyMyAxMi40MTggMCA2Ljg1NCA1LjU2NiAxMi40MiAxMi40MjMgMTIuNDJzMTIuNDE0LTUuNTY2IDEyLjQxNC0xMi40MmMwLTYuODYtNS41NTktMTIuNDE5LTEyLjQxNC0xMi40MTltMCAyMi4xNzNhOS43NTIgOS43NTIgMCAwIDEtOS43NTUtOS43NTUgOS43NCA5Ljc0IDAgMCAxIDkuNzU1LTkuNzQ4IDkuNzQ1IDkuNzQ1IDAgMCAxIDkuNzUyIDkuNzQ4IDkuNzUgOS43NSAwIDAgMS05Ljc1MiA5Ljc1NW01LjEwMi0xMi42MzRhNC4yMiA0LjIyIDAgMCAwLTEuMjM2LTIuOTc2IDQuMiA0LjIgMCAwIDAtMi45NzgtMS4yM2gtNS45ODR2MTQuMTc1aDIuNjZ2LTUuNzU3aDEuOTA5bDIuNjg3IDUuNzU3aDIuOTQzbC0yLjgwNy02LjAwM2E0LjIyIDQuMjIgMCAwIDAgMi4wMzItMS41MzhjLjUwMi0uNzEuNzcyLTEuNTU4Ljc3NC0yLjQyOG0tNC4yMTQgMS41NWgtMy4zMjR2LTMuMTAyaDMuMzI0Yy44NTUgMCAxLjU1NS42OTUgMS41NTUgMS41NTNhMS41NTcgMS41NTcgMCAwIDEtMS41NTUgMS41NSIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik03MjAuMjU5IDEzMy45MTRINjg0LjM1Yy0xLjQ1OS00LjE2OS0zLjkwMS04LjI1NC03LjUwMi0xMS44NDctMTAuNDE5LTEwLjQzNC0yNC40MTctMTIuMTI5LTMyLjU2OS0zLjk4My0xLjcyMiAxLjcyOC0zLjAwOCAzLjc4Ni0zLjg2MyA2LjA3LTIuNDAxLTEuNzU3LTUuNDEtMy4zNDYtOC45OTYtNC43NjctNS4wNDItMTAuNTg2LTEyLjE2MS0yNS41NTItMjguMTY0LTI1LjU1Mi01LjcxNiAwLTEwLjgzNSAxLjc3NC0xNC44NTggMy43NzItMTEuNzk4LTkuMzQ1LTM3LjM4LTI2LjgzNS02My40OTItMjYuODM1LTI4LjU5MiAwLTY4LjI2NSAyNi4yNTUtNzkuODk5IDI2LjI1NS04LjQ3NSAwLTI3LjQ4OC00MS45NDgtNTcuMDA2LTQxLjk0OC0xNS44NTYgMC0zMS45MjEgMTAuNzQ2LTUxLjA2MyAyMi4yOTMtMTguMjYxIDEwLjkzNy0yMy4xNDMgMjQuMTY0LTI4LjQyNSAzOC4xMTItMS44MDEgNC41NDctOS43NjQgMTIuODY3LTE1LjI5MSAxOC40M0gyMDEuNmwxNTYuMDE3IDI3MS4zMDhIMjUwLjgwNGwtMzQuMDE3IDYxLjI1OGgxNTYuNzI2YzUuMzczIDAgMTEuMzQxLTEuODM5IDE2LjY1OC00LjYzNmw3MC43NjYgMTIzLjA3NyA2OC44NjItMTE5Ljc2NWg1Ny4zNTFWNDMxLjU3aC0zLjg1Yy0uMDM4LTExLjY2Ny04Ljg3LTI0LjM4OC0xMy4yOTktMzAuMDA0bC0uODQ2LTQuODUyIDEzLjE1OC0yMi45IDc2LjY5Mi0yOC4yODJjMTIuNDUxLTQuNTkgMTguMjM1LTE1Ljc0NyAyMC45MjYtMjQuNDY2IDAgMCA4LjQ2LS4wODQgMTYuMTc2LTguOTQ1IDUuNDA4IDEuMzkzIDEyLjI4NyAyLjgzMSAxNy42MTcgMi44MzEgMTEuNjA0IDAgMjMuNzkyLTYuNjMyIDI2Ljk0LTE4Ljk4IDAgMCAxMi4yODQtNy41NSAxNy43MzYtMzAuNzU3bC05NS40NjgtMzEuNjA1eiIvPjxwYXRoIGZpbGw9IiMwMTAxMDEiIGQ9Im02NDUuODc0IDI1MS40MjEgMTEuOTg2IDMuOTY2LS4wNzggNy43M2MtNi4zODQtLjI0My0xMS40OTEtMS40NTgtMTEuNDkxIDE3LjIwNyAwIDEzLjkyNSAyLjY1NiAxOC40MzYgMi42NTYgMjIuMzYzIDAgNi42NjItLjU2OCA4LjI0My0yMS41MSA4LjI0MyAwIDAtMy4yNy0zLjk3LTE0Ljc1Ny04LjQxOCAwIDAtLjIxNy0xLjA2My0uNjg2LTMuMDE0bDg4LjcwMi0xNTQuMjU3aC0yNi44NzNjMS45ODgtMy44MTguMDI5LTEwLjE2Ni00Ljk3OC0xNS4xNzUtNS42Ny01LjY2My0xMy4wODQtNy40NDYtMTYuNTU1LTMuOTc2LTEuNTgxIDEuNTc1LTIuMDYxIDMuOTcxLTEuNTk3IDYuNjVsLTExLjA0NyAxMS41ODJjLjI5OC0xLjc0OS45MjItMTAuOTQtMTYuNDI3LTE1Ljg5NS01LjIyOC0xMC4zNDQtOS41ODctMjMuMjc0LTE5Ljk2My0yMy4yNzQtOC40NzggMC0xNS44MzYgNi40NDctMTUuODM2IDYuNDQ3cy0zMS42OTYtMjkuNTEtNjIuNTEzLTI5LjUxYy0yNi43NSAwLTYzLjY1NiAyNi4yNjMtNzkuOSAyNi4yNjMtMTcuMzMyIDAtMzIuNjQ4LTQxLjk1OS01Ny4wMDUtNDEuOTU5LTEzLjA5MyAwLTI4LjU1MiAxMC41My00NS4xOSAyMC42NjEtMTYuNjMgMTAuMS0xOS43MzEgMjIuNDgxLTIzLjc4NiAzMi42MzQtMi42ODYgNi43My0xMS4xOTMgMTUuNzQ4LTIxLjEzMSAyNS41NTJIMjIxLjE5bDE1NS43OTggMjcwLjk1N2MtMS4xODQuMjEzLTIuMzM1LjM2LTMuMzg4LjM2SDI1Ny40N2wtMjEuNDQyIDM4LjU5MmgxMzcuNDg1YzUuODQ3IDAgMTMuODYyLTMuNTE0IDE3LjgwOS03LjgzbDIuMTk0LTIuMzc1IDY3LjQyMiAxMTcuMjUyIDYyLjMwNS0xMDguMzY4aDUyLjU4OXYtMTAuOTM0aC0xMi42MzZsLTIuMjQyLTcuMDNoMS45MjZsOS4xMDQtNC4yMTJjMC0xMC41MDYtMTIuNjMyLTI1LjI1Ny0xMi42MzItMjUuMjU3bC0yLjA2Mi0xMS43NjYgMTcuMjU3LTMwLjAxOCA4MC41NDYtMjkuNzA3YzE0LjI4LTUuMjYyIDE1Ljg3NC0yNi4wNzcgMTUuODc0LTI2LjA3N3MxMy4wOTYgNi4xNTIgMjAuMzI5LTkuODI3YzAgMCAxNC41MjQgNC42NDEgMjIuNDI3IDQuNjQxIDYuODU5IDAgMTYuNDQ5LTMuNzA0IDE2LjQ0OS0xNC4wMDkgMCAwIDEwLjU3Ny02LjMzNyAxNC4wMzUtMTcuMTc4bC05NC44OTctMzEuNDMyem03Ljg5LTExNC4zOWMzLjMwOCAwIDUuMjA5IDEuMjggNS4yMDkgMy4xMzMgMCAxLjg0NC02LjY5MSAxMC42MzItMTUuMTc1IDEwLjYzMi0xLjc4OCAwLTIuMjAyLS45NzgtMi4yMDItMS41MyAwLTIuNzA1IDguODQyLTEyLjIzNiAxMi4xNjctMTIuMjM2em0tNy4xNTEgMTguMjIyYzcuODI3IDkuNDQxIDguMTA1IDE5LjgwMyA4LjEwNSAxOS44MDNsLTEwLjM2OS0xOC4xOThjMC0xLjg1NSAyLjI2NC0xLjYwNSAyLjI2NC0xLjYwNW0tNC44MTggNi4yMDhzMTEuNDMgMTIuNjQ3IDExLjQzIDE5Ljc4YzAgMy45MDgtMy4xMjIgMi4zMzctMy4xMjIgMi4zMzdsLTExLjA3NC0xNi41ODl6bTEuODQ4IDMwLjY1Yy01LjQzMiAwLTEwLjYwMy0xNC43MzgtMTAuNjAzLTE0LjczOHMuNTQ0LTIuOTggMy40NDktMi45OGM5LjI3NCA3LjkxMSA3LjE1NCAxNy43MTggNy4xNTQgMTcuNzE4bS0xOC40NjYtNy44MzNjOS4yMTMgMCAxMi44MzggMTYuNzggMTIuMDI0IDE5LjgyNS04LjkzNyAwLTEyLjAyNC0xOS44MjUtMTIuMDI0LTE5LjgyNW0zLjIzOSAzMC4xOTFjLTEzLjAxNiAwLTE5LjYwOC0yMy41MjItMTkuNjA4LTIzLjUyMnMuMjYxLTMuMjYgOS40NzYtMi41MzdjMCAwIDEzLjA3OCAxMy4yODYgMTAuMTMyIDI2LjA2bTguNjUtNTkuMDFjMCAxMS44MjEtMTMuNjc4IDI2LjM0Mi0yMC40NTQgMjYuMzQyLTMuNTcgMC00LjEwOC0yLjgyOS00LjEwOC0yLjgyOXM4LjQ1LTE3Ljk3MyAyMC45NzktMjYuMDRjMCAwIDMuNTgzLjA5MyAzLjU4MyAyLjUyNm0tMTIuMS0xOC4yMDljNS42NjktMy4yMzkgMTQuMDQ0IDcuMjM1IDYuMDQ3IDExLjI4OC0xMS44MTIgNS43ODEtMjQuNTE1IDMwLjIxLTI0LjUxNSAzMC4yMS01LjY5Ni45Ni03LjgxNS0yLjUzLTcuODE1LTIuNTNzMi41MTUtMjMuNTcgMjYuMjgzLTM4Ljk2OE00ODEuMDg3IDM0MS44MzFjLTQuMzk4IDUuMDEtMTYuNzQxLTMuNTg1LTEyLjA1Ni04LjQ4OWwxMjguOTg2LTEzNS41NjZjNC43NzctNC43NyAxMS4xMSAxLjEzNiA2LjU4MyA2LjIwMnptOC43NjcgMTUuODA3LTEuMTMgMy42OTUtNC4zOC0uNjg0LjY5OS02LjQ4N2MyLjU2Mi0uNzAzIDMuNjI5IDIuNzczIDQuODExIDMuNDc2bS0xMy4yNzctNi4zMTNjNC40MzggMCA0LjI1OCA2LjM4IDQuMjU4IDE2Ljk0NiAwIDcuMDQ4LTIuNjk0IDkuODc2LTQuNTQ1IDkuODc2LTMuMzIzIDAtMy4xNTMtNS4wOTctNC4xNzMtNi45MSAwIDAgMS4zNzEtMS43OTUgMS4zNzEtNS4zODggMC0zLjYwOC0xLjgwOS0xNC41MjQgMy4wODktMTQuNTI0bS02MC4yNjktMTIuNThjLTIuODk3IDIuODgxLTguMSAyLjUxOC04LjEgMi41MThzLTE0LjE2Mi0xMi40Ni01LjUyMS0yNC40MzljOS4xNTcgNS42MSAxMy42MiAyMS45MiAxMy42MiAyMS45MnptLTYuNzMxLTI2LjA1YzAtNS4zNjIgMTEuNDA0LTkuMTI1IDExLjQwNC45MzMgMCAxMi43MyAyLjQ1IDEyLjUyNCAyLjQ1IDE0LjI3MyAwIDIuMzY2LTQuNjA2LjY4LTQuNjA2LjY4IDAtMy44OS05LjI0Ny0xMC41MzctOS4yNDctMTUuODg3em0yMy44NzYgMjQuNTFjNS41MzcgMCAzLjYwOSA3LjA1MSAzLjYwOSA3LjA1MS05LjkzMi0yLjM2OS0yNC42NzkgMTEuNzQ1LTI0LjY3OSAxMS43NDVzLS45OTktMi4yMDUtLjk5OS00LjY3OWMwLTQuNzk3IDEwLjgxMi0xNC4xMTcgMjIuMDY4LTE0LjExN3ptLTcuOTI1LTI1LjQ0YzAtNy4yOSA2LjkyMy0xMC43OSA2LjkyMyA5LjQ1Ny0yLjQxNiAyLjQwNi02LjkyMy0xLjMzNi02LjkyMy05LjQ1OXptLTQuODU1IDQ0Ljk0MmM5LjIwOSAyOS42MjMgMTcuNTg3IDQ1LjU1OCAxNy41ODcgNDUuNTU4bC0zLjI3MyAxLjcxMXMtMTYuNzM2LTExLjgzLTE5LjE0OS0zOS42NjJ6bTYuNzEyLTMuNjg0YzE2LjE4NS04LjkyOSAyMi41ODkgMTguMjE0IDIyLjU4OSAxOC4yMTQgMCAyNS44Ny0yLjUzIDMwLjE5NC0yLjUzIDMwLjE5NC0zLjc3OC0uOTgtMTIuNzMzLTE4LjQ2Ni0yMC4wNTktNDguNDA4bTE2LjgyLTIyLjM3NWMtMS44MDkgMS4wMi01LjczNyAxLjIxNS01LjczNy00LjY3OSAwLTUuNzAyLTEuODcxLTEzLjk0OC42NzktMTkuNTEyIDguOTE3IDQuMjE0IDIuODA4IDE5LjcxNCA1LjA1OCAyNC4xOTFtLS45NzIgMTIuNjhjMC0xLjk0MiAyLjQzNC01LjA3MiA3LjA0Mi01LjA3MiA0LjYxOCAwIDguOTAzLjc5MyA4LjkwMyA1LjY5NiAwIDUuOTktNy4yNDUgMTAtOC41MTMgMTAtMi4yMzIgMC03LjQzMi01LjUzNS03LjQzMi0xMC42MjRtNC44OTktMzMuODcyczcuMDMtLjczOCA3LjAzIDcuOTQyYzAgMy40MTEuMDA2IDkuMTI0LjM0OSAxMS42NDUtMS41ODEgMi40NDgtNi4yMi40NjMtNi4yMi40NjNzLTIuMzIyLTEyLjg3LTEuMTU5LTIwLjA1bTguMjk5IDU0Ljg1OHM5LjQ1NS05LjUwNCA5LjQ1NSAxMy4zNmMwIDE5LjMyLTEzLjAwOCAyOS4wNTEtMTMuMDA4IDIxLjQzOCAwLTQuNjgzIDQuODgyLTQuMTUgMy41NTItMzQuNzk4em00LjYwMy00OC4xNzZzNC41MjctMi4wODUgNC41MjcgNy4zNDFjMCA5LjUwNS0xLjAwMSA4Ljk0MS0yLjQzNiA5Ljc0IDAgMC0zLjg2Ni01Ljg3LTIuMDkxLTE3LjA4bTQuNTEzIDQyLjIyM2MtMS4zOTEgMC0zLjgwNS0xLjQ4OC0zLjgwNS0zLjQxNCAwLTUuOTA5IDEuNTktOS4zMzkgNC40Ni05LjMzOSAxLjc0MyAwIDIuNDY5IDEuOTEzIDIuNDY5IDMuOTQ4IDAgNi42LTIuMTU4IDguODA1LTMuMTI0IDguODA1bTEzMC4xMS0xNzIuNzI5czQuNTQ4LTEuOTg4IDcuMTA0IDYuMTFjLTQuMDU4LS4yMTUtNi41MjcgMS41NzQtNi41MjcgMS41NzRzLTIuNDAxLTQuOTcyLS41NzctNy42ODRtMTIuNzM1LTc1LjAzNCA1LjAxNyAxMC43NWMtNS4zMTggMC05LjAxNC04LjAzLTkuMDE0LTkuNTkgMC0yLjAzMyAzLjUyLTIuMTk0IDMuOTk3LTEuMTZtLTExLjExOC42MjEgMTUuOTA3IDIxLjY0OHMtMS4yNDIgMi41OC0zLjQzOS4yMzJsLTE3LjMxNS0xOC40MzdzLjgyNi0zLjQ0MyA0Ljg0Ny0zLjQ0M20tOC4wNjggOC4wMzEgMTguOTI5IDIxLjY4MmMxLjAyMiAxLjAyNS0yLjQzOSAzLjc2OC00LjM5NiAxLjg1bC0yMS40NDQtMjAuOTc1czQuMzk2LTUuNDM2IDYuOTExLTIuNTU3bS0xMS4yODYgNy4zMzZjMy4xODMgMCAyMy41NTggMTUuNzM3IDIzLjU1OCAyMC4zODQgMCAuNTM4LTEuNDg3IDIuNjM4LTIuMzUxIDIuMDI2bC0yNS44MjUtMTguNDQ2czEuNDM4LTMuOTY0IDQuNjE4LTMuOTY0bS04LjkxIDEwLjE3YzkuOTY4IDQuNTE4IDE4LjgyMiAxMC4xNSAyNy43OTggMTYuMTA2IDEuNDkxIDEuMDA0LS44NTYgNS42Ny0yLjMwNCA0LjkwMmwtMjcuMTU4LTE0LjczOXMtLjgzMS0yLjk1NCAxLjY2NC02LjI3bS0zLjA4NCAxMi4yNGM1LjUzOCAxLjU4MiAyMy42ODcgMTEuNjAyIDI2LjAzNiAxMy4xNTcgMi4wMiAxLjMxMS0uODU5IDQuMzEzLTEuODI4IDMuOTAzbC0yNS42MDItMTEuOTc3cy0xLjcwNy0xLjkyIDEuMzk0LTUuMDgzbS00Ljg3NiAxMC4zNzJjMTAuMTcgMi44NjcgMjMuMDczIDkuNjkzIDIzLjA3MyA5LjY5My0xOC4xNDIuOTA4LTIzLjc0OS03LjU5OS0yMy43NDktNy41OTl6bS0xMTQuNjg0LTIuNjAzYzM4LjU4NyAwIDgxLjM4NyAzNi42OTUgMTEwLjcyNiA3Ny4zODRsLTgwLjIwMSA4NC4yNzRjLTQ0Ljc4OC0yMy42NTktODguMTk1LTYxLjIxNy04OC4xOTUtMTA5LjQ5NiAwLTI2LjgxNSAyMy4yMy01Mi4xNjIgNTcuNjctNTIuMTYyTTM0MS44NTEgOTguOTc3YzYuNDMxLTMuMDY5IDEwLjk1IDMuMDY1IDEwLjk1IDMuMDY1LS44NzkgMi4zNzMtNy45MDEgNy4zNi03LjkwMSAxMi4zMzUgMCAyLjY4IDEzLjI1MSAyLjkwNSAxMy4yNTEgMTMuMTQ1IDAgNC40NzUtMi4yODUgNi43MjMtMi4yODUgNi43MjNsLTUuMjQ0LjQzNnMyLjI1OC0yLjIxNyAyLjI1OC02LjQyYzAtMy42MTUtMy42NDEtNi43My02LjE3Ni02LjczLTcuNTMyIDAtNS43NjIgMTAuODk2LTEwLjk5IDYuNTczIDEuNTUyLTguNDgzIDUuMTcxLTE1LjExOCA2LjEzNy0yOS4xMjdtLTI1LjM1OCAzNi40NzhjMTQuMDMyIDE0LjA0NCAyMC4zNjUgMjkuNDgyIDIwLjM2NSAyOS40ODItMi44MzEgNy4wMi0zMy42ODMgMjEuMDUxLTMzLjY4MyAyMS4wNTFsMTguMjQ5LTMzLjY3NS00NS42MzUgMzkuMzA3cy43MDMtMTguMjU1IDYuMzE0LTI0LjU3NGM1LjYyMi02LjI5NCAzNC4zOS0zMS41OSAzNC4zOS0zMS41OU0yNjIuOTA0IDQ1MC4zNmgtMTguNzIzbDE2LjEwOS0yOS4wMDJoMTguNzM4em0xMjQuODgxLTYuMjljLTMuMDYgMy4zNDctOS43MjUgNi4yOS0xNC4yNzIgNi4yOWgtMTMuNzUxbDEzLjEyMi0yOS4wMDJoLjcxN2M3LjA4MyAwIDE2LjUyNy0zLjkzOCAyMS41MjUtOC45NzRsMjIuMTY1LTIyLjM1MyA4LjY4IDEyLjM5em0xNDUuNzg5LTguMjA0aDE0LjQ5OGwtMi4wMTQgNy4wM2gtMTYuNTE5em0tNDUuMTkzLTYuNjQ4Yy0xLjE4OS0xLjUxNC4wOTEtNC40OSAyLjgxMi02LjYzMiAyLjc2MS0yLjE2OCA1Ljk3My0yLjY2MyA3LjE0NC0xLjEzIDEuMjA0IDEuNTEzLS4wNTggNC41LTIuODA1IDYuNjU1LTIuNzU4IDIuMTQ3LTUuOTYyIDIuNjM4LTcuMTUxIDEuMTA3bTcyLjEyNSAxNy4zODNoMTEuNjR2My41NDZoLTkyLjIyOGMxLjQ0My03Ljc1OCA1Ljg4My0xMy4xNCA2Ljg5Ni0xNC4yOGgzLjJsNi4wOCAxMC43MzRoMTAuMDMybDMuNDA5LTEwLjczNmg1LjYyNWwzLjkzIDEwLjczNmgyOS43NmwzLjA1NS0xMC43MzZoNS4xNzd6bTMuNzc0LTk5Ljc0NWMtMTMuMDkzIDAtMzguMDMzLTYuMTc2LTY1LjA4OC0xNy43OTNsNjkuNDctNzcuNTQ5YzE0LjkzIDI0LjQyNCAyNC4yNCA0OC42MjMgMjQuMjQgNjUuNzc4IDAgMjYuMjIzLTE2LjUxIDI5LjU2My0yOC42MjIgMjkuNTYzem0xMDUuOTUyLTgwLjM0NCAzLjkwNC01LjczNyAyMy4xNzggNy42NjYuMjA3IDcuMTJ6bTQ0LjM1IDMwLjk4OGMtMy4zOTcuODE0LTYuNTE2LS4wNDQtNi45NTgtMS45NDItLjQ3Mi0xLjg2NSAxLjkyOS00LjA3NiA1LjMxOC00Ljg5NiAzLjM2Ny0uODE0IDYuNTEzLjA3NiA2Ljk1MSAxLjk1MS40NjMgMS44ODUtMS45MTggNC4wNzMtNS4zMTEgNC44ODdtLTQuMDg4LTE3LjY0IDQuMTA2LTUuNjg0IDQuOTQ1IDEuNjQyIDEuNDkzIDcuNTM1em0tNTguODM5LTM0LjE2NSA4Ny42MjkgMjkuMDA0Yy0zLjA4IDUuOTUtOC4zNTIgOS45NTMtMTAuMjg0IDExLjI5MmwtMy45MzktMS4zLTIuMzA3LTExLjcxNS05LjU0OS0zLjE1OS02LjM5MSA4LjgxNy01LjU1Ny0xLjg0LS4zNDMtMTEuMDM4LTI4LjI3Mi05LjM2Mi02LjA2NSA4LjkxNi01LjExMy0xLjY5Ny4xMTQtMTAuODg4LTExLjA0Mi0zLjY1NXoiLz48cGF0aCBmaWxsPSIjZmZiODFjIiBkPSJNNDA5LjgzOCAzNjIuMTUzYy00Ljk3Ny0xMS45OS0yLjc3OC0xNC43MjQtMi43NzgtMTQuNzI0cy0xNS45ODktMTMuMTM2LTExLjI0NS0yOS40NzljMCAwLTQxLjE1NC01OS42MzMtNDEuMTU0LTk0Ljk4OSAwLTE4LjMwMiA4Ljg4MS0xNi41MiA4Ljg4MS0zMS40ODIgMC0xMi4yODQtOC40MDQtMjEuNDY1LTE0LjQyNS0yMS40NjUtNi45MDIgMC0yOC40NDYgMTQuMjI2LTU5Ljk5OCAzMi44MjFsMTEuOTQyLTI3LjM2OC0yOC43NzggMjkuNDkxcy01LjYyMS0yOC43ODkgOS44NjQtNDQuMjU4YzIuNTA5LTIuNTMgNS4wODMtNS4wMjkgNy42MzktNy41MjlIMjM0Ljg5bDE0OS44MTIgMjYwLjUxN2MyLjcyOS0xLjMwMyA1LjI1LTIuOTA1IDcuMDEtNC42OTJsMjMuNjE3LTIzLjgwOWMtMy43NzctOC44NDctNS40OS0xOC4wMTMtNS40OS0yMy4wMzR6bTE4MC4zODUtMTgyLjQ3Mi0yLjgwMy02LjMxN2MtMTQuNTE1IDIuNDQ1LTI3LjUwNi00LjkxNC0zMS4yMTktNi44MjktMy43MjEtMS44ODguMzQtMTAuMDIuMzQtMTAuMDJzLTEuMDA3LTEuNzU0LTMuMjg5LTMuMzQ1aC0xNS4xODNjLTIuODU4IDIuNTY3LTMuNTI1IDYuNTI2LTEuMTg5IDguOTM1IDE2LjExMiAxNi43MjEgMjkuMDQ2IDM0LjY2NSAzOS4zNTEgNTEuOTYzbDE2Ljg0MS0xNy43MDV6bTYxLjU2Ny0yNC4wOThjOC44MTQgMTAuNDIgNS4xNzcgMjEuMDg3IDUuMTc3IDIxLjA4NyAwIDguMDYtNC4yNiA3LjkyNC00LjI2IDcuOTI0IDAgMTguNzQ1LTkuODM5IDE1LjQ1My05LjgzOSAxNS40NTMgMCAyNC42NzEtMjcuMTc1IDE0LjY3LTI3LjE3NSAxNC42Ny00LjQzNC0uNTc0LTguMTI2LTEuODAzLTExLjEzLTMuMjYybC0xOC4zOTkgMjAuNTMyYzExLjkyNyAyMy4yMjEgMTkuMDc3IDQzLjg1NyAyMi44OTEgNTYuNzE4bDc3LjkxLTEzNS41MzVoLTMzLjAwOHpNNTI1LjY0OCAzNTIuMzMxYzAtMS42NTctMjQuNzA0LTguMjE3LTM0LjM5Ni0xMS45My04Ljg2MSAzLjQ4MiAyLjY0OSA1LjI2IDIuNjQ5IDE2Ljc2OCAwIDYuODItMy4zMiAxNC44Mi0zLjMyIDE0LjgybC00LjkzNCAxLjRzLTkuODE5IDE4LjExMS0xNi4xMjcgMTUuNDQ0Yy05LjAwNCAxNS44MzUtMTIuNjg4IDE5LjUtMjYuOTkzIDE5LjUtNC41OTUgMC04LjYzOC0xLjMzOS0xMi4xOTMtMy41NzdsLTMxLjIwNyAzNC4wMzcgNjEuODExIDEwNy40OTUgNTMuMTYxLTkyLjQ1OWgtMzguMjE4YzAtOS44NDUgNi4yNjEtMTcuOTY1IDYuMjYxLTE3Ljk2NSAwLTE1LjY3IDkuNjUxLTE5LjAwOCAxNi44NC0xOS42NDkgMTUuMjc3LTEuMzQ0IDIxLjUwNS0uMDE4IDIxLjUwNS03LjQ4MiAwLTUuMjctLjQ1OS0xMS40OS0uNDU5LTExLjQ5aDUuNjJjMC0yMC41MjgtNS43NC0yNS41MTItNS43NC0zNS45ODkgMC00LjAxMiA1Ljc0LTUuNzQ1IDUuNzQtOC45MjNtLTQuNDc1IDg5LjE4OCAzLjI1LTUuNjU1aC01LjM0MXoiLz48cGF0aCBmaWxsPSIjZmZiODFjIiBkPSJNNDk4LjIzNSA0NDIuODk2aDUuMTkybDIuMjQtNy4wMzJoLTExLjQxMXptNTEuODgxLTUxLjcyIDExLjk4My0yMC44NC0xMy4zNjUgNi41NnoiLz48L3N2Zz4=",
+  "MTL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDAxZTYyIiBkPSJNNzA0LjAyNyA0OTkuNzg1Yy03LjI3OSAwLTEzLjE4OCA1LjkwMS0xMy4xODggMTMuMTg0IDAgNy4yNzYgNS45MSAxMy4xODUgMTMuMTg4IDEzLjE4NXMxMy4xOC01LjkwOSAxMy4xOC0xMy4xODRjMC03LjI4NC01LjktMTMuMTg1LTEzLjE4LTEzLjE4NW0wIDIzLjU0YTEwLjM1IDEwLjM1IDAgMCAxLTEwLjM1NS0xMC4zNTUgMTAuMzQgMTAuMzQgMCAwIDEgMTAuMzU1LTEwLjM0OWM1LjcyMiAwIDEwLjM1NCA0LjYyNiAxMC4zNTQgMTAuMzVzLTQuNjMyIDEwLjM1NC0xMC4zNTQgMTAuMzU0bTUuNDE4LTEzLjQxMmE0LjQ2IDQuNDYgMCAwIDAtMS4zMTItMy4xNiA0LjQ1IDQuNDUgMCAwIDAtMy4xNjItMS4zMDdoLTYuMzUydjE1LjA1aDIuODIzdi02LjExMmgyLjAyNmwyLjg1NCA2LjExMmgzLjEyM2wtMi45OC02LjM3M2E0LjQ3NSA0LjQ3NSAwIDAgMCAyLjk4LTQuMjFtLTQuNDc0IDEuNjQ1aC0zLjUyOXYtMy4yOTNoMy41MjhjLjkwOCAwIDEuNjUxLjczOCAxLjY1MSAxLjY1YTEuNjUgMS42NSAwIDAgMS0xLjY1IDEuNjQzIi8+PHBhdGggZmlsbD0iI2ZmZiIgZD0ibTczNS45MDkgMzE2Ljk1IDQ3LjAyNy00OS40MDMtMjYuNzExLTEyMy4xMzgtMTE4LjgwNC0zNS4yNzctMTAuNjg1IDkuOTA1QzU4Ny4wMDcgMTA3LjE4MSA1MTUuNTU0IDk0LjkxNiA0NjcuODIzIDk1Yy0xNzYuODI3LjMwOC0zMTUuNzYxIDk4LjYzNC0zMTYuMjk4IDIyMy44MzggMCAxMDcuMTI0IDkyLjM5NCAyMjYuMTY0IDMxNy44MDggMjI2LjE2NCAxNzguNjA2IDAgMzM5LjE0Mi0xMTguOTAzIDMzOS4xNDItMTE4LjkwM3oiLz48cGF0aCBmaWxsPSIjMDAxZTYyIiBkPSJtNzIwLjIxIDMxNS41ODMgNDkuMzAzLTUxLjc5Ni0yMy43NzgtMTA5LjY1NS0xMDUuMDg2LTMxLjE5NS0xMC43NzIgOS45ODRjLTM1LjQ3Mi0xMS43MDQtMTExLjMwMy0yNS42OTQtMTYyLjA0Mi0yNS42MDUtMTcyLjQ1LjMtMzAzLjQ5MyA5NC44OTMtMzAzLjk5NyAyMTEuNTgyLS41MjIgMTIyLjMyMSAxMTguMTE4IDIxMy43ODIgMzA1LjQ5MyAyMTMuNzgyIDEzMS4xMjEgMCAyNjUuNDYxLTY5Ljk4NiAzMjIuMjMyLTEwOS43NzNsLTcxLjM1NC0xMDcuMzI1eiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik00ODguNzIxIDM1Ny4wODNINDYwLjA3djI0LjI5MmwyOC42NTEtLjAzM3ptMTc0LjI3Mi0zMi4yODJjLTIyLjI2NS0xOS42MDctNTQuNjg3LTQwLjE0NS05NS43MzctNTAuMTI4VjM2NS42YzMwLjk4Mi04LjU2NiA2NC45NzUtMjMuMTA3IDk1LjczNy00MC43OTl6bS0yODIuOTExIDQ0LjM2M3YtOTguNTQ4Yy0yOC40NTkgOC4yMjgtNjAuMzUyIDI0LjMzNC02MC4zNTIgNDkuODQgMCAxNy40NiAyNi45NTQgMzguNTMzIDYwLjM1MiA0OC43MDhtODAuNjMyLTg2LjY2aDI3Ljg0NXYtMjMuMDc5bC0yNy44NDUtMS4xMzJ6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTcwMS43NjUgMzI2Ljk5OHMtNzQuNDIgNTAuNzgtMTU2LjQ2NCA2Ni4xMDVWMjQ4LjkyN2M4OS4wODggMTEuMjA4IDE0MS44NTggNjkuNDU0IDE0MS44NTggNjkuNDU0bDU5LjM2MS02MS4zNTgtMTkuMDYzLTg2LjA2LTgxLjExNi0yMy43MjItMTAuMjg4IDExLjIxNmMtMzIuOTE1LTEyLjg2NC0xMDAuODIyLTI5LjUzLTE3Ni4xMDctMjkuNTMtMTUwLjcyNCAwLTI3My44MTEgODUuMzk3LTI3NC4wMzIgMTkwLjc4OC0uMjE4IDEwMi42NCAxMDQuMjU2IDE5MS40OTQgMjcyLjg5MiAxOTEuNDk0IDE1NS43OTIgMCAyNjguMjQtNzQuMjEzIDMwMy40NTctOTQuMTA1ek00NDQuNjQ3IDI5OS44NHYtNTkuMDU1YzIwLjYxLTEuMDM1IDQzLjQ4MS4wMzggNTkuNjYgMS45N3Y1Ny4wODZ6bTU5LjY2IDM5LjA1NXY1OS40NjVjLTE2Ljc3OSAyLTQyLjM2NCAyLjQ5NC01OS42NiAxLjIxNnYtNjAuNjh6TTQwMS44MyAyNDQuMjE2djE1MS4yOTFjLTI0LjgzNSAwLTEwNC4wOTktMjkuMTQ1LTEwNC4wOTktNzUuMDU3IDAtNTYuNzU2IDgwLjk5Ny03Mi40MjggMTA0LjA5OS03Ni4yMzQiLz48cGF0aCBmaWxsPSIjYTYxOTJlIiBkPSJNNjk3LjQyIDM0OC4zMjdjLTk3LjM4MSA1Ny4xODQtMTYyLjE4OCA2OC4yODUtMjQxLjI1NSA2Ny41NDQtMTExLjEzLTEuMDQ4LTE3NC40MTctNDUuNTA5LTE3NC40MTctOTguNDYyIDAtNDcuNzQgNTguMDU1LTkzLjI0IDE3Ni42NTktOTMuMjQgNzkuNzk2IDAgMTc2LjAyMyAyMS4zODMgMjI3LjQxMSA3Mi4wMzZsNDIuNzg5LTQzLjYwNy0xNC42MTEtNjkuMjA5LTYzLjA5MS0xOC40MzUtMTEuNDU0IDEyLjk0NWMtMzQuNTc4LTEzLjg2Mi05My4wMjMtMzMuMDI2LTE4Mi45MjgtMzMuMDI2LTEzNS42NTIgMC0yNTQuNjE2IDc4LjM1My0yNTQuNjE2IDE3My4yMDcgMCA5OS4wODggMTAzLjU4NSAxNzYuNzg1IDI1MC42MDMgMTc2Ljc4NSAxNDkuMSAwIDIzNi42MTgtNTYuMjA5IDI4Ny4xNjctODIuNzI2bC00Mi4yNTgtNjMuODEzeiIvPjwvc3ZnPg==",
+  "SEA": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDQxYzJjIiBkPSJNMjY4LjUgNDg2Ljg4YzEwMy40NzkgOS4wNDMgMTY5LjEyNyAzOC4yMjQgMjAxLjA3NSA5OC42MiAxMDkuMzgxLTE3LjcyMiAyMTAuNTY0LTg3Ljg2NiAyMTAuNTY0LTE3OC4yNjkgMC0xMjAuNDUtMTQ1Ljk2My0xMzkuMzgtMTQ5Ljg1LTE3NC40NjIgNjEuMzk4IDIyLjI1MyAxMjguOTgxLTEuMTY4IDE2MS4yMzEtNzcuNzU2LTk1LjM4MS03LjA0OS0xNjUuMi00MS44MjgtMTk1LjM3NS0xMDAuNTEzLTExNi45OTUgMjAuODI0LTIxMC41ODMgOTYuNTA1LTIxMC41ODMgMTc4LjI2OSAwIDExOS40MjMgMTUzLjUxNiAxNTEuMDIxIDE3MC43MTggMTc2LjM3NS04My43NzgtMzEuNzU4LTE1Ni4wNTQgNC40MzEtMTg3LjggNzcuNzU2eiIvPjxwYXRoIGZpbGw9IiM5Y2RiZDkiIGQ9Ik00NTAuMDM2IDIyNi41ODZjLTEzLjA5NC0xMy4zMTItMTguNTUzLTIzLjcyMy0xOC41NTMtMzcuNDU4IDAtMTUuNzI5IDcuNTk0LTIzLjQyMiA3LjU5NC0zMi4yMjIgMC03LjU3Mi00Ljc1NC0xMy41MTMtMTMuODU5LTE1LjMwNiA1LjM5OS01LjgyIDEyLjczMS05LjM0NCAxOS41Ni05LjM0NCAzOS4wMzkgMCA1MC41NjEgODYuMjU0IDEzMi4wMjMgODMuMTUzIDI5LjAyNy0yLjc3OSA1Ni40NjMtMTYuODk2IDczLjcwNi00MS42MjctNzEuMTI4LTkuMjIzLTEzNi4wNzItMzkuNDUyLTE2Ny43OTgtOTAuODI2LTMyLjkxNSA1Ljk4MS0xNzAuOTQxIDUzLjYxLTE2Ny40NTYgMTUzLjEzNiAzLjY0NiAxMDMuNzk1IDE1Ny4xNjIgMTMyLjYzNCAyMDAuMTA5IDE3Ny4yMDEgMzMuODYyIDM1LjE0MiAxMC4wMTEgNzAuNTY2LTExLjgyNCA4My40MzUtMzMuNzIxLTg3LjY2NC0xNDQuNTMyLTkzLjkwNy0xODguNjQ3LTMwLjYzMSA3MS4xMjggOS4yMjQgMTM2LjA3MSAzOS40NTIgMTY3Ljc5OCA5MC44MjYgNzguNDYtMTYuNDUzIDExNi4zMS04NS4yNDggMTAxLjkwNy0xMzQuODctMjMuODUtODIuMTA2LTE3OC42NzUtOTYuNTY1LTIxOS43MjgtMTczLjQ3NS0yMS45MzctNDMuMjc5LTMuOTA4LTg5LjQ3NyAzNi4yMTgtMTE2LjM2Mi0xNS43NTIgMjAuMy0yMy4yODYgNDMuNjgxLTIyLjk0NCA2NS41NzIgMy41NjYgMy44ODYgNS4wNzcgMTIuOTY5IDUuMTE3IDEzLjE1LjUyNCAzLjE4MiAxLjQ1IDkuODg4LS4yMDIgMTMuOTk3IDEuNzUzIDQuNjExIDQuMDA5IDkuMDAyIDYuNjg4IDEzLjIxMSA1LjM3OSAxLjM0OSAxMS40MDIgOC4zMzcgMTEuNTQzIDguNDk4IDUuOTAyIDYuNzg3IDYuODI4IDExLjA3NyA2Ljk2OSAxMi43MDggMy42NDYgMy4yNjIgNy41NzQgNi40MDQgMTEuNzA0IDkuNDY1IDMuNDY1LS40MDMgOC43MjIgMS4yNjkgMTQuMDggNC42NzIgNi4xNjQgNC4wNDggOS4yNDYgOC4wMzYgMTAuMTEzIDExLjAzNmE0NzAgNDcwIDAgMCAwIDEzLjIxNCA3LjM5MWMzLjQ0NS0uOTQ2IDkuMTI1LjE2MiAxNC44MjYgMy4wODIgNS43MjEgMi45MiA5LjkzMSA2Ljk0OCAxMS4xNTkgMTAuMzExIDQuNTMzIDIuMjU1IDkuMDg1IDQuNTExIDEzLjYzOCA2Ljc2NiAzLjQ0NC0xLjAwNyA5LjE4NSAwIDE0Ljk0NyAyLjkyIDUuNjQgMi44NiA5Ljc0OSA2LjgyOCAxMS4wNTggMTAuMTUgNC42NTQgMi40MTcgOS4yODcgNC44NTQgMTMuODM5IDcuMzUxIDQuMjMxLS44NjYgMTAuOTk5IDEuNzEyIDE0LjY2NSAzLjkwNyA1LjQzOSAzLjI0MiA5LjE2NSA3LjQ3MiAxMC4yNzMgMTAuODc1YTIzNSAyMzUgMCAwIDEgMTMuMzE1IDkuMjQ0YzMuNjA2LS4xNjEgOC45MDQgMS44OTMgMTMuODM5IDYuMTAyIDUuMzM4IDQuNjMyIDguMDc4IDkuNzQ3IDguMTk5IDEzLjI5MSAzLjY4NiAzLjk0OCA3LjA3IDguMDU2IDEwLjA5MiAxMi4zMjUgNC4zNzEgMS4wODggOC43NjIgNi4xNDMgMTEuMjIgMTEuMTk3IDMuNDA0IDcuMzkxIDIuOTQxIDEyLjYwNyAxLjk1NCAxNS4yODYgNS44ODIgMTguMzY2IDcuNDczIDQxLjUwNi0xLjk5NCA2OC4xMDktLjEwMS4yODItLjIyMi42MDQtLjM2My45NDcgMTkuODIyLTIxLjU2OSAzMy4yMTctNDguMTEyIDMyLjA4OS03OS45OTItMy42NDYtMTAzLjc5NS0xNTcuMTYyLTEzMi42MzQtMjAwLjEwOS0xNzcuMjAxeiIvPjxwYXRoIGZpbGw9IiNjODEwMmUiIGQ9Ik01MDguOTU3IDIzNy40ODFjLTE3LjU0Ni0yMC4xNzktMjguNzQ2LTU1LjkyNi00OC4wODQtNjkuOTAyLTguNjgyIDMwLjc5MiA5LjM4NyA2NC40NjQgNDguMDg0IDY5LjkwMiIvPjxwYXRoIGZpbGw9IiM2YmE0YjgiIGQ9Ik00OTUuMDU3IDUyNi44OTZjLTYuMzI1IDE4LjU0OC0xMi4zNjggMzAuMDQ3LTEyLjM2OCAzMC4wNDctMzEuNzI3LTUxLjM3NC05Ni42Ny04MS41ODItMTY3Ljc5OC05MC44MjYgNzMuNTA1LTM2LjgzNCAxNDkuNTg4IDEuOTEzIDE4MC4xNjYgNjAuNzc5bTE1NS40My0zNTMuMTE0Yy03My41MDUgMzYuODM0LTE0OS41ODgtMS45MTMtMTgwLjE2Ny02MC43NzkgNi4zMjYtMTguNTQ4IDEyLjM2OS0zMC4wNDcgMTIuMzY5LTMwLjA0Ny0zMS4wODIgNS42Ni0xNzAuOTgxIDUyLjc2NC0xNjcuNDU2IDE1My4xMzYgMy42NDYgMTAzLjc5NSAxNTcuMTYyIDEzMi42MzQgMjAwLjEwOSAxNzcuMjAxIDMzLjg2MiAzNS4xNDIgMTAuMDExIDcwLjU2Ni0xMS44MjUgODMuNDM1YTI4MSAyODEgMCAwIDEtOC40NiAzMC4xNDhjMTUuOTk0LTIuNzggNjQuNDgtMjguNDM2IDY0Ljc4My03Ny44MTcuNDQzLTY4LjA0OS04Ny41NDUtODYuMDczLTE1NC4yMjItMTI3LjM3Ny01NC44OTEtMzMuOTk1LTY1LjU0OC02Ny43MjctNjguMzI3LTg5LjA3NC02LjU0Ny01MC4yMjcgMjguOTA2LTk2LjEwMyA4MC40MzQtMTE3LjczMi03LjM5MyA2LjMwNC0xMy4xMzQgMTIuNDQ2LTE2LjY1OSAxNy4zNC0xNS43NTIgMjAuMy0yMy4yODYgNDMuNjgxLTIyLjk0NCA2NS41NzIgMy41NjYgMy44ODYgNS4wNzYgMTIuOTY5IDUuMTE3IDEzLjE1LjUyMyAzLjE4MiAxLjQ1IDkuODg4LS4yMDIgMTMuOTk3IDEuNzUzIDQuNjExIDQuMDA5IDkuMDAyIDYuNjg4IDEzLjIxMSA1LjM3OCAxLjM0OSAxMS40MDEgOC4zMzcgMTEuNTQyIDguNDk4IDUuOTAzIDYuNzg3IDYuODI5IDExLjA3NyA2Ljk3IDEyLjcwOCAzLjY0NiAzLjI2MiA3LjU3NCA2LjQwNCAxMS43MDQgOS40NjUgMy40NjQtLjQwMyA4LjcyMiAxLjI2OSAxNC4wOCA0LjY3MiA2LjE2NCA0LjAyOCA5LjI0NiA4LjAzNiAxMC4xMTIgMTEuMDM2YTQ3MiA0NzIgMCAwIDAgMTMuMjE1IDcuMzkxYzMuNDQ0LS45NDYgOS4xMjUuMTYyIDE0LjgyNiAzLjA4MiA1LjcyIDIuOTIgOS45MzEgNi45NDggMTEuMTU5IDEwLjMxMSA0LjUzMyAyLjI1NSA5LjA4NSA0LjUxMSAxMy42MzggNi43NjYgMy40NDQtMS4wMDcgOS4xODUgMCAxNC45NDYgMi45MiA1LjY0MSAyLjg2IDkuNzUgNi44MjggMTEuMDU5IDEwLjE1IDQuNjU0IDIuNDE3IDkuMjg3IDQuODU0IDEzLjgzOSA3LjM1MSA0LjIzLS44NjYgMTAuOTk5IDEuNzEyIDE0LjY2NSAzLjkwNyA1LjQzOSAzLjI0MiA5LjE2NSA3LjQ3MiAxMC4yNzMgMTAuODc1YTIzNSAyMzUgMCAwIDEgMTMuMzE1IDkuMjQ0YzMuNjA2LS4xNjEgOC45MDQgMS44OTMgMTMuODM5IDYuMTAyIDUuMzM4IDQuNjMyIDguMDc4IDkuNzQ3IDguMTk5IDEzLjI5MSAzLjY4NiAzLjk0OCA3LjA3IDguMDU2IDEwLjA5MiAxMi4zMjUgNC4zNzEgMS4wODggOC43NjIgNi4xNDMgMTEuMjIgMTEuMTk3IDMuNDA0IDcuMzkxIDIuOTQxIDEyLjYwNyAxLjk1NCAxNS4yODYgNS44ODIgMTguMzY2IDcuNDczIDQxLjUwNi0xLjk5NSA2OC4xMDkgMjUuMzIxLTQyLjkxNiAyMi44ODQtODUuNTA5LTUuNDE4LTEyMS41MTctNTkuMTYzLTc1LjI1OS0yMDguMDA1LTg0LjI0MS0yMDcuNDYxLTE3MC41MTYuMTQxLTIwLjUyMSA4LjcwMi0zNi44NTQgMTkuNjgtNDkuMjM5IDUuMzk5LTUuODIgMTIuNzMxLTkuMzQ0IDE5LjU2LTkuMzQ0IDM5LjAzOCAwIDUwLjU2MSA4Ni4yNTQgMTMyLjAyMiA4My4xNTMgMjkuMDI4LTIuNzc5IDU2LjQ2My0xNi44OTcgNzMuNzA3LTQxLjYyN3oiLz48cGF0aCBmaWxsPSIjMDQxYzJjIiBkPSJNNTk0Ljc4OSA1NTQuODY5YzAgNS4xMzUgNC4xNyA5LjMwNCA5LjMwNyA5LjMwNHM5LjMwNi00LjE2OSA5LjMwNi05LjMwNC00LjE1LTkuMzA1LTkuMzA2LTkuMzA1LTkuMzA3IDQuMTY5LTkuMzA3IDkuMzA1bTE2LjYxOSAwYzAgNC4wMjctMy4yNjMgNy4zMS03LjMxMiA3LjMxYTcuMzEyIDcuMzEyIDAgMSAxIDAtMTQuNjIxIDcuMyA3LjMgMCAwIDEgNy4zMTIgNy4zMTEiLz48cGF0aCBmaWxsPSIjMDQxYzJjIiBkPSJNNjAwLjI2OCA1NjAuMTg1aDEuOTk0di00LjMzaDEuNDMxbDIuMDE0IDQuMzNoMi4xOTZsLTIuMDk1LTQuNTExYTMuMTIgMy4xMiAwIDAgMCAyLjA5NS0yLjk2IDMuMTUgMy4xNSAwIDAgMC0zLjE0My0zLjE2MmgtNC40OTJ6bTEuOTk0LTguNjE5aDIuNDk4Yy42MjUgMCAxLjE0OC41MjMgMS4xNDggMS4xNjhzLS41MjMgMS4xNjgtMS4xNDggMS4xNjhoLTIuNDk4eiIvPjwvc3ZnPg=="
+};
+
+    function getNHLBadgeHTML(teamCode) {
+      const src = NHL_LOGOS[teamCode];
+      if (src) {
+        return `<img src="${src}" alt="${teamCode}" />`;
+      }
+      return `<span style="font-size:0.75rem; font-weight:700;">${teamCode}</span>`;
+    }
+
+    // État de l'application
+    let selectedWeekIdx = POOL_DATA.weeks.length - 1;
+    let currentSort = { key: 'rank', asc: true };
+    let activeTeams = new Set(POOL_DATA.teams.map(t => t.id));
+
+    // Calcul des statistiques cumulatives par semaine
+    function computeTimeline(maxWeekIdx) {
+      const weeksSlice = POOL_DATA.weeks.slice(0, maxWeekIdx + 1);
+      const teamsMap = {};
+      POOL_DATA.teams.forEach(t => {
+        teamsMap[t.id] = {
+          ...t,
+          cum_gp: 0,
+          cum_pts: 0,
+          history: []
+        };
+      });
+
+      weeksSlice.forEach((wk, wIdx) => {
+        let totalWkGP = 0;
+        let totalWkPts = 0;
+        POOL_DATA.teams.forEach(t => {
+          const r = wk.results[t.id] || { gp: 0, pts: 0 };
+          teamsMap[t.id].cum_gp += r.gp;
+          teamsMap[t.id].cum_pts += r.pts;
+          totalWkGP += teamsMap[t.id].cum_gp;
+          totalWkPts += r.pts;
+        });
+
+        const avgCumGP = totalWkGP / POOL_DATA.teams.length;
+        const expectedCumGP = (wIdx === 0) ? (82 * 20 / 28 - 13) : (82 * 20 / 28 - 13) + wIdx * (82 * 20 / 28);
+
+        const sortedIds = Object.keys(teamsMap).sort((a, b) => {
+          if (teamsMap[b].cum_pts !== teamsMap[a].cum_pts) {
+            return teamsMap[b].cum_pts - teamsMap[a].cum_pts;
+          }
+          const ppmB = teamsMap[b].cum_gp ? teamsMap[b].cum_pts / teamsMap[b].cum_gp : 0;
+          const ppmA = teamsMap[a].cum_gp ? teamsMap[a].cum_pts / teamsMap[a].cum_gp : 0;
+          return ppmB - ppmA;
+        });
+
+        const leaderPts = teamsMap[sortedIds[0]].cum_pts;
+
+        sortedIds.forEach((id, idx) => {
+          const tm = teamsMap[id];
+          const wkRes = wk.results[id] || { gp: 0, pts: 0 };
+          const prevRank = tm.history.length > 0 ? tm.history[tm.history.length - 1].rank : (idx + 1);
+          tm.history.push({
+            week: wk.week,
+            label: wk.label,
+            period: wk.period,
+            wk_gp: wkRes.gp,
+            wk_pts: wkRes.pts,
+            wk_ppm: wkRes.gp ? (wkRes.pts / wkRes.gp) : 0,
+            cum_gp: tm.cum_gp,
+            cum_pts: tm.cum_pts,
+            ppm: tm.cum_gp ? (tm.cum_pts / tm.cum_gp) : 0,
+            rank: idx + 1,
+            prev_rank: prevRank,
+            rank_delta: prevRank - (idx + 1),
+            trail: tm.cum_pts - leaderPts,
+            gp_vs_avg: tm.cum_gp - avgCumGP,
+            gp_vs_exp: tm.cum_gp - expectedCumGP,
+            avg_cum_gp: avgCumGP
+          });
+        });
+      });
+
+      return teamsMap;
+    }
+
+    function init() {
+      const select = document.getElementById('week-select');
+      select.innerHTML = POOL_DATA.weeks.map((w, i) =>
+        `<option value="${i}" ${i === selectedWeekIdx ? 'selected' : ''}>${w.label} (${w.period})</option>`
+      ).join('');
+
+      renderTeamFilters();
+      renderAll();
+      window.addEventListener('resize', () => renderCharts(computeTimeline(selectedWeekIdx)));
+    }
+
+    function onWeekChange() {
+      const select = document.getElementById('week-select');
+      selectedWeekIdx = parseInt(select.value, 10);
+      renderAll();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAll();
+    }
+
+    function renderTeamFilters() {
+      const container = document.getElementById('team-filters');
+      container.innerHTML = POOL_DATA.teams.map(t => {
+        const isActive = activeTeams.has(t.id);
+        const logoSrc = NHL_LOGOS[t.nhl_team] || '';
+        const logoImg = logoSrc ? `<img class="chip-logo" src="${logoSrc}" alt="${t.nhl_team}" />` : '';
+        return `<div class="team-chip ${isActive ? '' : 'inactive'}" onclick="toggleTeam('${t.id}')">
+          ${logoImg}
+          <span class="chip-dot" style="background:${t.color}"></span>
+          <span>${t.name}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function toggleTeam(teamId) {
+      if (activeTeams.has(teamId)) {
+        if (activeTeams.size > 1) activeTeams.delete(teamId);
+      } else {
+        activeTeams.add(teamId);
+      }
+      renderTeamFilters();
+      renderCharts(computeTimeline(selectedWeekIdx));
+    }
+
+    function toggleAllTeams(enable) {
+      if (enable) {
+        POOL_DATA.teams.forEach(t => activeTeams.add(t.id));
+      } else {
+        activeTeams = new Set([POOL_DATA.teams[0].id]);
+      }
+      renderTeamFilters();
+      renderCharts(computeTimeline(selectedWeekIdx));
+    }
+
+    function sortTable(key) {
+      if (currentSort.key === key) {
+        currentSort.asc = !currentSort.asc;
+      } else {
+        currentSort.key = key;
+        currentSort.asc = (key === 'rank' || key === 'name');
+      }
+      renderAll();
+    }
+
+    function renderAll() {
+      const timeline = computeTimeline(selectedWeekIdx);
+      const currentWeekObj = POOL_DATA.weeks[selectedWeekIdx];
+      document.getElementById('table-period-sub').textContent =
+        `Bilan cumulatif après la ${currentWeekObj.label} (${currentWeekObj.period}) • Cliquez sur un en-tête pour trier`;
+
+      renderKPIs(timeline);
+      renderStandingsTable(timeline);
+      renderCharts(timeline);
+      renderWeeklyMatrix(timeline);
+    }
+
+    function renderKPIs(timeline) {
+      const latestStats = Object.values(timeline).map(t => ({
+        team: t,
+        stat: t.history[t.history.length - 1]
+      }));
+
+      const leader = [...latestStats].sort((a, b) => a.stat.rank - b.stat.rank)[0];
+      const bestWeek = [...latestStats].sort((a, b) => b.stat.wk_pts - a.stat.wk_pts)[0];
+      const bestPPM = [...latestStats].sort((a, b) => b.stat.ppm - a.stat.ppm)[0];
+      const avgPts = (latestStats.reduce((acc, x) => acc + x.stat.cum_pts, 0) / latestStats.length).toFixed(1);
+      const avgWkPts = (latestStats.reduce((acc, x) => acc + x.stat.wk_pts, 0) / latestStats.length).toFixed(1);
+
+      document.getElementById('kpi-container').innerHTML = `
+        <div class="kpi-card gold">
+          <div class="kpi-label">🥇 Meneur au Classement</div>
+          <div class="kpi-value">
+            <img src="${NHL_LOGOS[leader.team.nhl_team]}" style="width:28px;height:28px;object-fit:contain;" />
+            ${leader.team.name} <span style="font-size:1rem; color:var(--accent-gold);">(${leader.stat.cum_pts} pts)</span>
+          </div>
+          <div class="kpi-sub">${leader.stat.cum_gp} matchs joués • ${leader.stat.ppm.toFixed(2)} pts/MJ</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">🔥 Meilleure Semaine (${leader.stat.label})</div>
+          <div class="kpi-value">
+            <img src="${NHL_LOGOS[bestWeek.team.nhl_team]}" style="width:28px;height:28px;object-fit:contain;" />
+            ${bestWeek.team.name} <span style="font-size:1rem; color:var(--accent-green);">(+${bestWeek.stat.wk_pts} pts)</span>
+          </div>
+          <div class="kpi-sub">En ${bestWeek.stat.wk_gp} matchs (${bestWeek.stat.wk_ppm.toFixed(2)} pts/MJ cette sem.)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">⚡ Meilleure Efficacité (Pts / MJ)</div>
+          <div class="kpi-value">
+            <img src="${NHL_LOGOS[bestPPM.team.nhl_team]}" style="width:28px;height:28px;object-fit:contain;" />
+            ${bestPPM.team.name} <span style="font-size:1rem; color:var(--accent-blue);">${bestPPM.stat.ppm.toFixed(3)}</span>
+          </div>
+          <div class="kpi-sub">${bestPPM.stat.cum_pts} pts en ${bestPPM.stat.cum_gp} matchs joués</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">📊 Moyenne de la Ligue</div>
+          <div class="kpi-value">${avgPts} pts</div>
+          <div class="kpi-sub">Moyenne en ${leader.stat.label} : ${avgWkPts} pts (${leader.stat.avg_cum_gp.toFixed(1)} MJ cumul.)</div>
+        </div>
+      `;
+    }
+
+    function renderStandingsTable(timeline) {
+      const rows = Object.values(timeline).map(t => {
+        const st = t.history[t.history.length - 1];
+        return {
+          id: t.id,
+          name: t.name,
+          nhl_team: t.nhl_team,
+          nhl_team_fr: t.nhl_team_fr,
+          color: t.color,
+          ...st
+        };
+      });
+
+      rows.sort((a, b) => {
+        const vA = a[currentSort.key];
+        const vB = b[currentSort.key];
+        if (typeof vA === 'string') {
+          return currentSort.asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+        }
+        return currentSort.asc ? (vA - vB) : (vB - vA);
+      });
+
+      const tbody = document.getElementById('standings-tbody');
+      tbody.innerHTML = rows.map(r => {
+        const rankClass = r.rank <= 3 ? `rank-${r.rank}` : '';
+        let deltaHtml = `<span class="delta-rank delta-same">–</span>`;
+        if (selectedWeekIdx > 0) {
+          if (r.rank_delta > 0) deltaHtml = `<span class="delta-rank delta-up">▲ +${r.rank_delta}</span>`;
+          else if (r.rank_delta < 0) deltaHtml = `<span class="delta-rank delta-down">▼ ${r.rank_delta}</span>`;
+        }
+
+        const gpAvgSign = r.gp_vs_avg > 0 ? '+' : '';
+        const gpAvgClass = r.gp_vs_avg > 0.5 ? 'pill-pos' : (r.gp_vs_avg < -0.5 ? 'pill-neg' : 'pill-neutral');
+
+        const gpExpSign = r.gp_vs_exp > 0 ? '+' : '';
+        const gpExpClass = r.gp_vs_exp > 0.5 ? 'pill-pos' : (r.gp_vs_exp < -0.5 ? 'pill-neg' : 'pill-neutral');
+
+        return `<tr>
+          <td>
+            <span class="rank-badge ${rankClass}">${r.rank}</span>
+            ${deltaHtml}
+          </td>
+          <td>
+            <div class="team-cell">
+              <div class="nhl-badge">${getNHLBadgeHTML(r.nhl_team)}</div>
+              <div class="team-name-wrap">
+                <span class="team-name" style="border-left: 3px solid ${r.color}; padding-left: 6px;">${r.name}</span>
+                <span class="team-nhl-sub">${r.nhl_team_fr}</span>
+              </div>
+            </div>
+          </td>
+          <td class="num">${r.cum_gp}</td>
+          <td class="num pts-strong">${r.cum_pts}</td>
+          <td class="num" style="font-weight:600; color:var(--accent-blue);">${r.ppm.toFixed(3)}</td>
+          <td class="num" style="color:${r.trail === 0 ? 'var(--accent-gold)' : 'var(--text-secondary)'}; font-weight:600;">
+            ${r.trail === 0 ? 'Meneur' : r.trail}
+          </td>
+          <td class="num"><span class="pill ${gpAvgClass}">${gpAvgSign}${r.gp_vs_avg.toFixed(1)}</span></td>
+          <td class="num"><span class="pill ${gpExpClass}">${gpExpSign}${r.gp_vs_exp.toFixed(1)}</span></td>
+          <td class="num" style="color:var(--text-secondary);">${r.wk_gp}</td>
+          <td class="num" style="font-weight:700; color:var(--accent-green);">+${r.wk_pts}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Moteur de graphiques SVG interactifs pleine largeur
+    function renderLineChart(containerId, timeline, metricKey, options = {}) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 900, 400);
+      const height = Math.max(rect.height || 440, 340);
+      const pad = { top: 28, right: 115, bottom: 42, left: 64 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+
+      const weeks = POOL_DATA.weeks.slice(0, selectedWeekIdx + 1);
+      const visibleTeams = Object.values(timeline).filter(t => activeTeams.has(t.id));
+
+      let allVals = [];
+      visibleTeams.forEach(t => {
+        t.history.forEach(h => allVals.push(h[metricKey]));
+      });
+      if (allVals.length === 0) allVals = [0, 1];
+
+      let minVal = options.minVal !== undefined ? options.minVal : Math.min(...allVals);
+      let maxVal = options.maxVal !== undefined ? options.maxVal : Math.max(...allVals);
+      if (minVal === maxVal) { minVal -= 1; maxVal += 1; }
+      else if (!options.exactBounds) {
+        const span = maxVal - minVal;
+        minVal -= span * 0.08;
+        maxVal += span * 0.08;
+      }
+
+      const xForIdx = (i) => weeks.length === 1 ? pad.left + plotW / 2 : pad.left + (i / (weeks.length - 1)) * plotW;
+      const yForVal = (v) => {
+        if (options.invertY) {
+          return pad.top + ((v - minVal) / (maxVal - minVal)) * plotH;
+        }
+        return pad.top + plotH - ((v - minVal) / (maxVal - minVal)) * plotH;
+      };
+
+      const steps = options.ySteps || 6;
+      let gridSvg = '';
+      for (let s = 0; s <= steps; s++) {
+        const val = minVal + (s / steps) * (maxVal - minVal);
+        const y = yForVal(val);
+        const label = options.formatY ? options.formatY(val) : val.toFixed(options.decimals || 0);
+        gridSvg += `
+          <line x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />
+          <text x="${pad.left - 12}" y="${y + 4}" fill="#94a3b8" font-size="12" text-anchor="end">${label}</text>
+        `;
+      }
+
+      if (minVal < 0 && maxVal > 0 && !options.invertY) {
+        const y0 = yForVal(0);
+        gridSvg += `<line x1="${pad.left}" y1="${y0}" x2="${pad.left + plotW}" y2="${y0}" stroke="rgba(255,255,255,0.28)" stroke-width="1.4" />`;
+      }
+
+      let xLabelsSvg = '';
+      weeks.forEach((w, i) => {
+        const x = xForIdx(i);
+        xLabelsSvg += `
+          <line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + plotH}" stroke="rgba(255,255,255,0.04)" />
+          <text x="${x}" y="${height - 12}" fill="#cbd5e1" font-size="12.5" font-weight="600" text-anchor="middle">Semaine ${w.week}</text>
+        `;
+      });
+
+      let linesSvg = '';
+      let pointsSvg = '';
+      let endLabels = [];
+
+      visibleTeams.forEach(t => {
+        const pts = t.history.map((h, i) => ({ x: xForIdx(i), y: yForVal(h[metricKey]), h }));
+        const pathD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+        const dash = t.line_style === 'dashed' ? '7,5' : (t.line_style === 'dotted' ? '2,5' : 'none');
+
+        linesSvg += `<path d="${pathD}" fill="none" stroke="${t.color}" stroke-width="3.2" stroke-dasharray="${dash}" stroke-linecap="round" stroke-linejoin="round" />`;
+
+        pts.forEach(p => {
+          const valFormatted = options.formatY ? options.formatY(p.h[metricKey]) : p.h[metricKey].toFixed(options.decimals || 0);
+          const tipHtml = encodeURIComponent(`<strong>${t.name} (${t.nhl_team})</strong><br/>${p.h.label} : <b>${valFormatted}</b><br/><span style='color:#94a3b8'>Cumul: ${p.h.cum_pts} pts (${p.h.cum_gp} MJ)</span>`);
+          pointsSvg += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5.5" fill="${t.color}" stroke="#0b1120" stroke-width="2"
+            style="cursor:pointer"
+            onmouseenter="showTooltip(event, decodeURIComponent('${tipHtml}'))"
+            onmousemove="moveTooltip(event)"
+            onmouseleave="hideTooltip()" />`;
+        });
+
+        const lastPt = pts[pts.length - 1];
+        endLabels.push({ y: lastPt.y, x: lastPt.x, name: t.name, color: t.color });
+      });
+
+      endLabels.sort((a, b) => a.y - b.y);
+      for (let i = 1; i < endLabels.length; i++) {
+        if (endLabels[i].y - endLabels[i - 1].y < 15) {
+          endLabels[i].y = endLabels[i - 1].y + 15;
+        }
+      }
+
+      const labelsSvg = endLabels.map(lbl =>
+        `<text x="${lbl.x + 10}" y="${lbl.y + 4}" fill="${lbl.color}" font-size="12.5" font-weight="700">${lbl.name}</text>`
+      ).join('');
+
+      container.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}">
+        ${gridSvg}
+        ${xLabelsSvg}
+        ${linesSvg}
+        ${pointsSvg}
+        ${labelsSvg}
+      </svg>`;
+    }
+
+    // Nuage de points Points vs Matchs joués (avec logos LNH)
+    function renderScatterChart(containerId, timeline) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 900, 400);
+      const height = Math.max(rect.height || 440, 340);
+      const pad = { top: 28, right: 115, bottom: 44, left: 64 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+
+      const visibleTeams = Object.values(timeline).filter(t => activeTeams.has(t.id));
+      let allGP = [];
+      let allPts = [];
+      visibleTeams.forEach(t => {
+        const last = t.history[t.history.length - 1];
+        allGP.push(last.cum_gp);
+        allPts.push(last.cum_pts);
+      });
+      if (allGP.length === 0) { allGP = [40, 110]; allPts = [40, 175]; }
+
+      const minX = Math.min(...allGP) - 5;
+      const maxX = Math.max(...allGP) + 5;
+      const minY = Math.min(...allPts) - 10;
+      const maxY = Math.max(...allPts) + 10;
+
+      const xFor = (v) => pad.left + ((v - minX) / (maxX - minX || 1)) * plotW;
+      const yFor = (v) => pad.top + plotH - ((v - minY) / (maxY - minY || 1)) * plotH;
+
+      let gridSvg = '';
+      for (let s = 0; s <= 5; s++) {
+        const yVal = minY + (s / 5) * (maxY - minY);
+        const y = yFor(yVal);
+        gridSvg += `
+          <line x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />
+          <text x="${pad.left - 12}" y="${y + 4}" fill="#94a3b8" font-size="12" text-anchor="end">${Math.round(yVal)} pts</text>
+        `;
+        const xVal = minX + (s / 5) * (maxX - minX);
+        const x = xFor(xVal);
+        gridSvg += `
+          <line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + plotH}" stroke="rgba(255,255,255,0.04)" />
+          <text x="${x}" y="${height - 12}" fill="#cbd5e1" font-size="12" font-weight="600" text-anchor="middle">${Math.round(xVal)} MJ</text>
+        `;
+      }
+
+      let dotsSvg = '';
+      visibleTeams.forEach(t => {
+        const last = t.history[t.history.length - 1];
+        const cx = xFor(last.cum_gp);
+        const cy = yFor(last.cum_pts);
+        const tipHtml = encodeURIComponent(`<strong>${t.name} (${t.nhl_team})</strong><br/>Matchs joués : <b>${last.cum_gp} MJ</b><br/>Points : <b>${last.cum_pts} pts</b><br/>Moyenne : <b>${last.ppm.toFixed(3)} pts/MJ</b>`);
+        dotsSvg += `
+          <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="8" fill="${t.color}" stroke="#fff" stroke-width="2"
+            style="cursor:pointer"
+            onmouseenter="showTooltip(event, decodeURIComponent('${tipHtml}'))"
+            onmousemove="moveTooltip(event)"
+            onmouseleave="hideTooltip()" />
+          <text x="${cx + 12}" y="${cy + 4}" fill="${t.color}" font-size="12.5" font-weight="700">${t.name}</text>
+        `;
+      });
+
+      container.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}">
+        ${gridSvg}
+        ${dotsSvg}
+      </svg>`;
+    }
+
+    function renderWeeklyBarsChart(timeline) {
+      const container = document.getElementById('chart-weekly-bars');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 900, 400);
+      const height = 420;
+      const pad = { top: 28, right: 35, bottom: 48, left: 58 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+
+      const weeks = POOL_DATA.weeks.slice(0, selectedWeekIdx + 1);
+      const teams = POOL_DATA.teams;
+      let maxPts = 100;
+      weeks.forEach(w => {
+        teams.forEach(t => {
+          const p = (w.results[t.id] || { pts: 0 }).pts;
+          if (p > maxPts) maxPts = p;
+        });
+      });
+      maxPts = Math.ceil(maxPts / 20) * 20;
+
+      const yFor = (v) => pad.top + plotH - (v / maxPts) * plotH;
+
+      let gridSvg = '';
+      for (let s = 0; s <= 5; s++) {
+        const val = (s / 5) * maxPts;
+        const y = yFor(val);
+        gridSvg += `
+          <line x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />
+          <text x="${pad.left - 12}" y="${y + 4}" fill="#94a3b8" font-size="12" text-anchor="end">${Math.round(val)}</text>
+        `;
+      }
+
+      const groupW = plotW / weeks.length;
+      const barW = Math.min(28, (groupW * 0.78) / teams.length);
+      let barsSvg = '';
+
+      weeks.forEach((w, wIdx) => {
+        const groupStart = pad.left + wIdx * groupW + (groupW - barW * teams.length) / 2;
+        teams.forEach((t, tIdx) => {
+          const res = w.results[t.id] || { gp: 0, pts: 0 };
+          const x = groupStart + tIdx * barW;
+          const y = yFor(res.pts);
+          const h = pad.top + plotH - y;
+          const tip = encodeURIComponent(`<strong>${t.name}</strong> • ${w.label}<br/>Points : <b>${res.pts} pts</b> (${res.gp} MJ)`);
+          barsSvg += `
+            <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(barW - 3, 4)}" height="${h.toFixed(1)}" rx="3" fill="${t.color}"
+              style="cursor:pointer"
+              onmouseenter="showTooltip(event, decodeURIComponent('${tip}'))"
+              onmousemove="moveTooltip(event)"
+              onmouseleave="hideTooltip()" />
+          `;
+        });
+        const centerGroup = pad.left + wIdx * groupW + groupW / 2;
+        barsSvg += `<text x="${centerGroup}" y="${height - 14}" fill="#cbd5e1" font-size="12" font-weight="600" text-anchor="middle">${w.label}</text>`;
+      });
+
+      container.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}">
+        ${gridSvg}
+        ${barsSvg}
+      </svg>`;
+    }
+
+    function renderWeeklyMatrix(timeline) {
+      const weeks = POOL_DATA.weeks.slice(0, selectedWeekIdx + 1);
+      const container = document.getElementById('weekly-matrix-container');
+      let ths = `<th>Pooler</th>`;
+      weeks.forEach(w => {
+        ths += `<th class="num">${w.label}<br/><span style="font-size:0.68rem; color:var(--text-muted); font-weight:400;">${w.period}</span></th>`;
+      });
+      ths += `<th class="num">Total Cumulatif</th>`;
+
+      const rows = Object.values(timeline).sort((a, b) =>
+        a.history[a.history.length - 1].rank - b.history[b.history.length - 1].rank
+      );
+
+      const trs = rows.map(t => {
+        const last = t.history[t.history.length - 1];
+        const cells = t.history.map(h => `
+          <td class="num">
+            <span class="pts-strong">${h.wk_pts} pts</span>
+            <span style="display:block; font-size:0.75rem; color:var(--text-secondary);">${h.wk_gp} MJ (${h.wk_ppm.toFixed(2)}/MJ)</span>
+          </td>
+        `).join('');
+        return `<tr>
+          <td>
+            <div class="team-cell">
+              <div class="nhl-badge">${getNHLBadgeHTML(t.nhl_team)}</div>
+              <div class="team-name-wrap">
+                <span class="team-name">${t.name}</span>
+                <span class="team-nhl-sub">${t.nhl_team_fr}</span>
+              </div>
+            </div>
+          </td>
+          ${cells}
+          <td class="num">
+            <span class="pts-strong" style="color:var(--accent-gold);">${last.cum_pts} pts</span>
+            <span style="display:block; font-size:0.75rem; color:var(--text-secondary);">${last.cum_gp} MJ (${last.ppm.toFixed(3)}/MJ)</span>
+          </td>
+        </tr>`;
+      }).join('');
+
+      container.innerHTML = `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+    }
+
+    function renderCharts(timeline) {
+      renderLineChart('chart-rank', timeline, 'rank', {
+        minVal: 1,
+        maxVal: POOL_DATA.teams.length,
+        exactBounds: true,
+        invertY: true,
+        ySteps: POOL_DATA.teams.length - 1,
+        formatY: v => `#${Math.round(v)}`
+      });
+      renderLineChart('chart-trail', timeline, 'trail', {
+        maxVal: 0,
+        decimals: 0,
+        formatY: v => `${Math.round(v)} pts`
+      });
+      renderLineChart('chart-ppm', timeline, 'ppm', {
+        decimals: 3,
+        formatY: v => v.toFixed(2)
+      });
+      renderLineChart('chart-gp-avg', timeline, 'gp_vs_avg', {
+        decimals: 1,
+        formatY: v => `${v > 0 ? '+' : ''}${v.toFixed(1)}`
+      });
+      renderScatterChart('chart-scatter', timeline);
+      renderWeeklyBarsChart(timeline);
+    }
+
+    function showTooltip(evt, html) {
+      const tt = document.getElementById('tooltip');
+      tt.innerHTML = html;
+      tt.style.display = 'block';
+      moveTooltip(evt);
+    }
+
+    function moveTooltip(evt) {
+      const tt = document.getElementById('tooltip');
+      tt.style.left = (evt.clientX + 14) + 'px';
+      tt.style.top = (evt.clientY + 14) + 'px';
+    }
+
+    function hideTooltip() {
+      document.getElementById('tooltip').style.display = 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
