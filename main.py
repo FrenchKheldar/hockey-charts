@@ -443,6 +443,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
+            <div class="control-group" id="roster-status-group">
+                <label>Roster Status</label>
+                <div class="toggle-switch">
+                    <button class="toggle-btn active" id="all-players-toggle">All-Time</button>
+                    <button class="toggle-btn" id="active-players-toggle">Active Only</button>
+                </div>
+            </div>
+
             <div class="control-group">
                 <label for="search-input">Search Player</label>
                 <div class="search-container">
@@ -517,6 +525,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             let currentTeam = "";
             let currentPlayerType = "skaters"; // "skaters" or "goalies"
             let currentStat = "";
+            let activeOnly = false;
             
             // Constants mapping clean stat codes to descriptions
             const SKATER_STATS = {
@@ -556,6 +565,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             const teamSelect = document.getElementById("team-select");
             const skatersToggle = document.getElementById("skaters-toggle");
             const goaliesToggle = document.getElementById("goalies-toggle");
+            const rosterStatusGroup = document.getElementById("roster-status-group");
+            const allPlayersToggle = document.getElementById("all-players-toggle");
+            const activePlayersToggle = document.getElementById("active-players-toggle");
             const searchInput = document.getElementById("search-input");
             const categoryList = document.getElementById("category-list");
             const tableCard = document.getElementById("table-card");
@@ -610,6 +622,24 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     goaliesToggle.classList.add("active");
                     skatersToggle.classList.remove("active");
                     updateCategoryList();
+                    renderDashboard();
+                }
+            });
+
+            allPlayersToggle.addEventListener("click", () => {
+                if (activeOnly) {
+                    activeOnly = false;
+                    allPlayersToggle.classList.add("active");
+                    activePlayersToggle.classList.remove("active");
+                    renderDashboard();
+                }
+            });
+
+            activePlayersToggle.addEventListener("click", () => {
+                if (!activeOnly) {
+                    activeOnly = true;
+                    activePlayersToggle.classList.add("active");
+                    allPlayersToggle.classList.remove("active");
                     renderDashboard();
                 }
             });
@@ -717,9 +747,18 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     return;
                 }
                 
+                // Determine if this franchise is currently active (any player has Active=1)
+                const isFranchiseActive = rawRows.some(r => r["Active"] === 1);
+                rosterStatusGroup.style.display = isFranchiseActive ? "flex" : "none";
+
                 // 2. Identify top 15 leaders from "Total" rows
                 let totalRows = rawRows.filter(r => r[seasonCol] === "Total");
                 
+                // Apply active roster filter if toggled on for an active franchise
+                if (activeOnly && isFranchiseActive) {
+                    totalRows = totalRows.filter(r => r["Active"] === 1);
+                }
+
                 // Apply player search filter if active
                 const query = searchInput.value.trim().toLowerCase();
                 if (query) {
@@ -736,7 +775,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 if (topLeaders.length === 0) {
                     document.getElementById("plotly-chart").innerHTML = `
                         <div class="loading-container">
-                            <p>No players found matching search.</p>
+                            <p>No players found matching filter.</p>
                         </div>`;
                     tableCard.style.display = "none";
                     return;
@@ -769,9 +808,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 } else if (currentStat === "GAA") {
                     hoverTemplateStr = '<b>%{customdata}</b><br>%{data.name}: %{y:.2f}<extra></extra>';
                 }
-
-                // Determine if this franchise is currently active (any player has Active=1)
-                const isFranchiseActive = rawRows.some(r => r["Active"] === 1);
 
                 // For each season, build a bar trace
                 seasonsList.forEach((season, sIdx) => {
@@ -822,7 +858,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                         family: "'Lora', Georgia, serif"
                     },
                     title: {
-                        text: `${teamData.name} All-Time Leaders: ${statLabel}`,
+                        text: `${teamData.name} ${(activeOnly && isFranchiseActive) ? 'Active Roster' : 'All-Time'} Leaders: ${statLabel}`,
                         font: {
                             family: "'EB Garamond', Georgia, serif",
                             size: 22,
@@ -866,7 +902,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 
                 // 6. Render Data Table
                 tableCard.style.display = "block";
-                tableTitle.textContent = `All-Time Leaders: ${statLabel} (Top 15)`;
+                tableTitle.textContent = `${(activeOnly && isFranchiseActive) ? 'Active Roster' : 'All-Time'} Leaders: ${statLabel} (Top 15)`;
                 
                 // Define headers
                 const showHeaders = ["Rank", "Player", "Pos", "Career GP", statLabel, "Best Season"];
