@@ -49,7 +49,7 @@
     }
 
     .header-inner {
-      max-width: 1400px;
+      max-width: 1450px;
       margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
@@ -119,7 +119,7 @@
 
     /* Main Container */
     main {
-      max-width: 1400px;
+      max-width: 1450px;
       margin: 1.75rem auto 0;
       padding: 0 1.5rem;
       display: flex;
@@ -358,6 +358,7 @@
     .pill-pos { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); }
     .pill-neg { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); }
     .pill-neutral { background: rgba(148, 163, 184, 0.15); color: var(--text-secondary); }
+    .pill-gold { background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.35); }
 
     /* Filter Chips for Charts */
     .team-filters {
@@ -435,7 +436,7 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       z-index: 1000;
       display: none;
-      min-width: 180px;
+      min-width: 190px;
     }
 
     /* Tabs */
@@ -478,6 +479,72 @@
     .tab-panel.active {
       display: flex;
     }
+
+    /* Draft Roster Grid (2 per row on large screens) */
+    .rosters-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+      .rosters-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .roster-card {
+      background: rgba(11, 17, 32, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.15rem;
+      box-shadow: var(--shadow);
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.81rem;
+    }
+
+    .roster-table th {
+      padding: 0.45rem 0.5rem;
+      font-size: 0.69rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .roster-table td {
+      padding: 0.42rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .roster-table tfoot td {
+      padding: 0.6rem 0.5rem;
+      font-weight: 800;
+      border-top: 2px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pos-badge {
+      display: inline-block;
+      width: 20px;
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      border-radius: 4px;
+      padding: 1px 0;
+    }
+    .pos-F { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .pos-D { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+    .pos-G { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+
+    .status-icon {
+      font-size: 0.72rem;
+      margin-left: 0.25rem;
+    }
   </style>
 </head>
 <body>
@@ -496,7 +563,7 @@
         <div class="tabs" style="border:none; padding:0;">
           <button class="tab-btn active" onclick="switchTab('classement', this)">Classement & Évolution</button>
           <button class="tab-btn" onclick="switchTab('hebdo', this)">Détails par Semaine</button>
-          <button class="tab-btn" onclick="switchTab('repechage', this)">Repêchage (À venir)</button>
+          <button class="tab-btn" onclick="switchTab('repechage', this)">Repêchage & Alignements</button>
         </div>
         <span class="week-selector-label">Vue arrêtée à :</span>
         <select id="week-select" class="week-select" onchange="onWeekChange()"></select>
@@ -630,14 +697,39 @@
       </section>
     </div>
 
-    <!-- TAB 3: Repêchage -->
+    <!-- TAB 3: Repêchage & Alignements -->
     <div id="tab-repechage" class="tab-panel">
-      <section class="card" style="text-align: center; padding: 3.5rem 1.5rem;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">📋🏒</div>
-        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Module d'Analyse du Repêchage (20 joueurs / équipe)</h2>
-        <p style="color: var(--text-secondary); max-width: 620px; margin: 0 auto 1.25rem;">
-          Cette section accueillera prochainement les analyses du repêchage initial (rendement par ronde, meilleurs vols, gardiens vs patineurs, blessures et points par choix).
-        </p>
+      <!-- Bar Chart of All 160 Picks in Snake Draft Order -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📊 Rendement du Repêchage — Points par Joueur selon l'Ordre de Sélection (#1 à #160)</div>
+            <div class="card-subtitle">
+              Ordre serpentin (Ronde 1 : Oliv → Pens73, Ronde 2 : Pens73 → Oliv, etc. + Ronde 21 de reprise). Cliquez sur un pooler pour filtrer ses choix.
+            </div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="tab-btn" style="font-size:0.78rem; padding:0.3rem 0.65rem;" onclick="toggleAllTeams(true)">Tout afficher</button>
+            <button class="tab-btn" style="font-size:0.78rem; padding:0.3rem 0.65rem;" onclick="toggleAllTeams(false)">Tout masquer</button>
+          </div>
+        </div>
+
+        <div class="team-filters" id="draft-team-filters"></div>
+
+        <div class="svg-chart-wrap" id="chart-draft-order" style="height: 460px;"></div>
+      </section>
+
+      <!-- Individual Rosters Comparison Report with Round Rank, Round Max, Round Min -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📋 Alignements Individuels & Comparaison par Ronde (au 17 nov. 2026)</div>
+            <div class="card-subtitle">
+              Pour chaque joueur : statistiques PoolExpert + <b>Rang Rd</b> (classement du choix au sein de sa ronde), <b>Max Rd</b> (meilleur total de cette ronde) et <b>Min Rd</b> (plus bas total de cette ronde).
+            </div>
+          </div>
+        </div>
+        <div class="rosters-grid" id="rosters-container"></div>
       </section>
     </div>
   </main>
@@ -964,40 +1056,1989 @@
       "period": "9 nov. - 15 nov. 2026",
       "results": {
         "COCO": {
-          "gp": 57,
-          "pts": 83
+          "gp": 64,
+          "pts": 97
         },
         "RAY77": {
-          "gp": 46,
-          "pts": 77
+          "gp": 49,
+          "pts": 88
         },
         "BRICIUS": {
-          "gp": 52,
-          "pts": 66
+          "gp": 59,
+          "pts": 72
         },
         "SHARKDARK": {
-          "gp": 43,
-          "pts": 63
-        },
-        "PENS73": {
-          "gp": 48,
-          "pts": 61
+          "gp": 46,
+          "pts": 70
         },
         "KHELDAR": {
-          "gp": 37,
-          "pts": 57
+          "gp": 42,
+          "pts": 66
         },
-        "OLIV": {
-          "gp": 49,
-          "pts": 47
+        "PENS73": {
+          "gp": 51,
+          "pts": 65
         },
         "FLY_98": {
-          "gp": 49,
-          "pts": 47
+          "gp": 55,
+          "pts": 64
+        },
+        "OLIV": {
+          "gp": 55,
+          "pts": 61
         }
       }
     }
-  ]
+  ],
+  "draft_date": "17 nov. 2026",
+  "draft_order_r1": [
+    "OLIV",
+    "KHELDAR",
+    "COCO",
+    "BRICIUS",
+    "FLY_98",
+    "SHARKDARK",
+    "RAY77",
+    "PENS73"
+  ],
+  "rosters": {
+    "OLIV": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "C. McDavid",
+        "nhl": "EDM",
+        "gp": 22,
+        "d1": 0,
+        "d7": 6,
+        "d30": 39,
+        "pts": 71,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 2,
+        "name": "C. Makar",
+        "nhl": "COL",
+        "gp": 19,
+        "d1": 0,
+        "d7": 2,
+        "d30": 17,
+        "pts": 29,
+        "status": "IR"
+      },
+      {
+        "pos": "D",
+        "rnd": 3,
+        "name": "Z. Werenski",
+        "nhl": "CBJ",
+        "gp": 18,
+        "d1": 0,
+        "d7": 1,
+        "d30": 13,
+        "pts": 18,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 4,
+        "name": "T. Thompson",
+        "nhl": "BUF",
+        "gp": 20,
+        "d1": 0,
+        "d7": 5,
+        "d30": 23,
+        "pts": 38,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "A. DeBrincat",
+        "nhl": "DET",
+        "gp": 21,
+        "d1": 0,
+        "d7": 0,
+        "d30": 10,
+        "pts": 25,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "B. Tkachuk",
+        "nhl": "FLA",
+        "gp": 22,
+        "d1": 0,
+        "d7": 5,
+        "d30": 21,
+        "pts": 41,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "A. Kempe",
+        "nhl": "LA",
+        "gp": 17,
+        "d1": 0,
+        "d7": 0,
+        "d30": 15,
+        "pts": 21,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "B. Sennecke",
+        "nhl": "ANA",
+        "gp": 21,
+        "d1": 0,
+        "d7": 6,
+        "d30": 32,
+        "pts": 47,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "D. Larkin",
+        "nhl": "DET",
+        "gp": 10,
+        "d1": 0,
+        "d7": 0,
+        "d30": 4,
+        "pts": 8,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "J. Snuggerud",
+        "nhl": "STL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 5,
+        "d30": 19,
+        "pts": 29,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "N. Schmaltz",
+        "nhl": "UTA",
+        "gp": 19,
+        "d1": 0,
+        "d7": 0,
+        "d30": 19,
+        "pts": 44,
+        "status": "R+IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "G. McKenna",
+        "nhl": "TOR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 1,
+        "d30": 17,
+        "pts": 24,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 13,
+        "name": "J. Chychrun",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 2,
+        "d30": 11,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 14,
+        "name": "S. Wedgewood",
+        "nhl": "COL",
+        "gp": 6,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 4,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "D. Strome",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 2,
+        "d30": 12,
+        "pts": 21,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "C. Verhaeghe",
+        "nhl": "FLA",
+        "gp": 22,
+        "d1": 0,
+        "d7": 4,
+        "d30": 20,
+        "pts": 40,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "B. Boeser",
+        "nhl": "VAN",
+        "gp": 23,
+        "d1": 7,
+        "d7": 10,
+        "d30": 26,
+        "pts": 36,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "M. Beniers",
+        "nhl": "SEA",
+        "gp": 18,
+        "d1": 0,
+        "d7": 2,
+        "d30": 12,
+        "pts": 18,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "C. Graf",
+        "nhl": "SJ",
+        "gp": 23,
+        "d1": 0,
+        "d7": 3,
+        "d30": 11,
+        "pts": 13,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 20,
+        "name": "J. Hofer",
+        "nhl": "STL",
+        "gp": 15,
+        "d1": 0,
+        "d7": 11,
+        "d30": 23,
+        "pts": 34,
+        "status": "DTD"
+      }
+    ],
+    "KHELDAR": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "N. MacKinnon",
+        "nhl": "COL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 0,
+        "d30": 19,
+        "pts": 45,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 2,
+        "name": "J. Hughes",
+        "nhl": "NJ",
+        "gp": 21,
+        "d1": 0,
+        "d7": 3,
+        "d30": 31,
+        "pts": 46,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "S. Reinhart",
+        "nhl": "FLA",
+        "gp": 22,
+        "d1": 0,
+        "d7": 8,
+        "d30": 23,
+        "pts": 40,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 4,
+        "name": "D. Guenther",
+        "nhl": "UTA",
+        "gp": 18,
+        "d1": 0,
+        "d7": 0,
+        "d30": 7,
+        "pts": 25,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "C. Gauthier",
+        "nhl": "ANA",
+        "gp": 20,
+        "d1": 0,
+        "d7": 8,
+        "d30": 54,
+        "pts": 63,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "L. Carlsson",
+        "nhl": "ANA",
+        "gp": 21,
+        "d1": 0,
+        "d7": 1,
+        "d30": 26,
+        "pts": 40,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "A. Barkov",
+        "nhl": "FLA",
+        "gp": 2,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 0,
+        "status": "DTD+IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "N. Hischier",
+        "nhl": "NJ",
+        "gp": 21,
+        "d1": 0,
+        "d7": 7,
+        "d30": 25,
+        "pts": 37,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "M. Geekie",
+        "nhl": "BOS",
+        "gp": 20,
+        "d1": 0,
+        "d7": 1,
+        "d30": 13,
+        "pts": 23,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "A. Svechnikov",
+        "nhl": "CAR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 7,
+        "d30": 17,
+        "pts": 41,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "D. Cozens",
+        "nhl": "OTT",
+        "gp": 21,
+        "d1": 0,
+        "d7": 2,
+        "d30": 15,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "D. Holloway",
+        "nhl": "STL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 4,
+        "d30": 13,
+        "pts": 20,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "C. Bedard",
+        "nhl": "CHI",
+        "gp": 14,
+        "d1": 0,
+        "d7": 5,
+        "d30": 20,
+        "pts": 25,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 14,
+        "name": "J. Dobes",
+        "nhl": "MTL",
+        "gp": 8,
+        "d1": 0,
+        "d7": 0,
+        "d30": 6,
+        "pts": 9,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "R. Hintz",
+        "nhl": "DAL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 5,
+        "d30": 24,
+        "pts": 33,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "J. Blake",
+        "nhl": "CAR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 4,
+        "d30": 20,
+        "pts": 31,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "J. McCann",
+        "nhl": "SEA",
+        "gp": 11,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 15,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "M. Coronato",
+        "nhl": "CGY",
+        "gp": 21,
+        "d1": 0,
+        "d7": 0,
+        "d30": 15,
+        "pts": 23,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "F. Nazar",
+        "nhl": "CHI",
+        "gp": 18,
+        "d1": 0,
+        "d7": 8,
+        "d30": 16,
+        "pts": 23,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 20,
+        "name": "B. Bussi",
+        "nhl": "CAR",
+        "gp": 8,
+        "d1": 0,
+        "d7": 3,
+        "d30": 7,
+        "pts": 13,
+        "status": ""
+      }
+    ],
+    "BRICIUS": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "N. Kucherov",
+        "nhl": "TB",
+        "gp": 20,
+        "d1": 0,
+        "d7": 10,
+        "d30": 27,
+        "pts": 41,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 2,
+        "name": "A. Matthews",
+        "nhl": "TOR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 3,
+        "d30": 25,
+        "pts": 48,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "M. Boldy",
+        "nhl": "MIN",
+        "gp": 22,
+        "d1": 0,
+        "d7": 10,
+        "d30": 22,
+        "pts": 37,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 4,
+        "name": "J. Swayman",
+        "nhl": "BOS",
+        "gp": 15,
+        "d1": 0,
+        "d7": 0,
+        "d30": 9,
+        "pts": 32,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "T. Stützle",
+        "nhl": "OTT",
+        "gp": 21,
+        "d1": 0,
+        "d7": 4,
+        "d30": 20,
+        "pts": 43,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "S. Crosby",
+        "nhl": "PIT",
+        "gp": 20,
+        "d1": 0,
+        "d7": 0,
+        "d30": 10,
+        "pts": 20,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "F. Forsberg",
+        "nhl": "NSH",
+        "gp": 21,
+        "d1": 0,
+        "d7": 7,
+        "d30": 26,
+        "pts": 35,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "D. Batherson",
+        "nhl": "OTT",
+        "gp": 21,
+        "d1": 0,
+        "d7": 2,
+        "d30": 21,
+        "pts": 32,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 9,
+        "name": "I. Shesterkin",
+        "nhl": "NYR",
+        "gp": 5,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 19,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "B. Nelson",
+        "nhl": "COL",
+        "gp": 21,
+        "d1": 0,
+        "d7": 7,
+        "d30": 11,
+        "pts": 22,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "B. Horvat",
+        "nhl": "NYI",
+        "gp": 19,
+        "d1": 0,
+        "d7": 6,
+        "d30": 17,
+        "pts": 36,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "M. Michkov",
+        "nhl": "PHI",
+        "gp": 23,
+        "d1": 0,
+        "d7": 4,
+        "d30": 22,
+        "pts": 35,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "T. Wilson",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 1,
+        "d30": 1,
+        "pts": 8,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "M. Stone",
+        "nhl": "VGK",
+        "gp": 22,
+        "d1": 0,
+        "d7": 4,
+        "d30": 17,
+        "pts": 47,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "J. Doan",
+        "nhl": "BUF",
+        "gp": 20,
+        "d1": 0,
+        "d7": 3,
+        "d30": 7,
+        "pts": 10,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "L. Stankoven",
+        "nhl": "CAR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 2,
+        "d30": 21,
+        "pts": 35,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "T. Foerster",
+        "nhl": "PHI",
+        "gp": 22,
+        "d1": 0,
+        "d7": 4,
+        "d30": 13,
+        "pts": 15,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "M. Misa",
+        "nhl": "SJ",
+        "gp": 23,
+        "d1": 0,
+        "d7": 1,
+        "d30": 14,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "J. DeBrusk",
+        "nhl": "VAN",
+        "gp": 21,
+        "d1": 4,
+        "d7": 4,
+        "d30": 12,
+        "pts": 20,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 20,
+        "name": "M. Bourque",
+        "nhl": "NSH",
+        "gp": 17,
+        "d1": 0,
+        "d7": 2,
+        "d30": 4,
+        "pts": 5,
+        "status": "DTD"
+      }
+    ],
+    "COCO": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "L. Draisaitl",
+        "nhl": "EDM",
+        "gp": 22,
+        "d1": 0,
+        "d7": 8,
+        "d30": 56,
+        "pts": 79,
+        "status": "R"
+      },
+      {
+        "pos": "G",
+        "rnd": 2,
+        "name": "I. Sorokin",
+        "nhl": "NYI",
+        "gp": 13,
+        "d1": 0,
+        "d7": 3,
+        "d30": 10,
+        "pts": 27,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "M. Necas",
+        "nhl": "COL",
+        "gp": 21,
+        "d1": 0,
+        "d7": 2,
+        "d30": 24,
+        "pts": 43,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 4,
+        "name": "J. Eichel",
+        "nhl": "VGK",
+        "gp": 22,
+        "d1": 0,
+        "d7": 5,
+        "d30": 16,
+        "pts": 44,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "M. Scheifele",
+        "nhl": "WIN",
+        "gp": 21,
+        "d1": 0,
+        "d7": 14,
+        "d30": 29,
+        "pts": 39,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 6,
+        "name": "E. Bouchard",
+        "nhl": "EDM",
+        "gp": 22,
+        "d1": 0,
+        "d7": 11,
+        "d30": 35,
+        "pts": 59,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "J. Slafkovsky",
+        "nhl": "MTL",
+        "gp": 21,
+        "d1": 0,
+        "d7": 1,
+        "d30": 9,
+        "pts": 15,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "W. Smith",
+        "nhl": "SJ",
+        "gp": 23,
+        "d1": 0,
+        "d7": 6,
+        "d30": 19,
+        "pts": 32,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "R. Thomas",
+        "nhl": "STL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 2,
+        "d30": 13,
+        "pts": 21,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "T. Konecny",
+        "nhl": "PHI",
+        "gp": 13,
+        "d1": 0,
+        "d7": 0,
+        "d30": 8,
+        "pts": 11,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 11,
+        "name": "L. Hutson",
+        "nhl": "MTL",
+        "gp": 21,
+        "d1": 1,
+        "d7": 2,
+        "d30": 12,
+        "pts": 23,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "P. Martone",
+        "nhl": "PHI",
+        "gp": 23,
+        "d1": 0,
+        "d7": 1,
+        "d30": 8,
+        "pts": 14,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "S. Bennett",
+        "nhl": "FLA",
+        "gp": 22,
+        "d1": 0,
+        "d7": 6,
+        "d30": 10,
+        "pts": 19,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "O. Tippett",
+        "nhl": "PHI",
+        "gp": 17,
+        "d1": 0,
+        "d7": 2,
+        "d30": 5,
+        "pts": 8,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "J. Miller",
+        "nhl": "NYR",
+        "gp": 22,
+        "d1": 1,
+        "d7": 4,
+        "d30": 15,
+        "pts": 24,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "A. Frondell",
+        "nhl": "CHI",
+        "gp": 20,
+        "d1": 0,
+        "d7": 3,
+        "d30": 8,
+        "pts": 15,
+        "status": "DTD"
+      },
+      {
+        "pos": "G",
+        "rnd": 17,
+        "name": "L. Ullmark",
+        "nhl": "OTT",
+        "gp": 10,
+        "d1": 0,
+        "d7": 6,
+        "d30": 9,
+        "pts": 27,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "G. Perreault",
+        "nhl": "NYR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 3,
+        "d30": 11,
+        "pts": 20,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 19,
+        "name": "D. Raddysh",
+        "nhl": "TOR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 4,
+        "d30": 10,
+        "pts": 14,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 21,
+        "name": "L. Evangelista",
+        "nhl": "NJ",
+        "gp": 18,
+        "d1": 0,
+        "d7": 1,
+        "d30": 10,
+        "pts": 16,
+        "status": "DTD"
+      }
+    ],
+    "PENS73": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "D. Pastrnak",
+        "nhl": "BOS",
+        "gp": 20,
+        "d1": 0,
+        "d7": 3,
+        "d30": 19,
+        "pts": 40,
+        "status": "DTD"
+      },
+      {
+        "pos": "G",
+        "rnd": 2,
+        "name": "A. Vasilevskiy",
+        "nhl": "TB",
+        "gp": 15,
+        "d1": 0,
+        "d7": 3,
+        "d30": 16,
+        "pts": 28,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "M. Rantanen",
+        "nhl": "DAL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 1,
+        "d30": 25,
+        "pts": 35,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 4,
+        "name": "J. Oettinger",
+        "nhl": "DAL",
+        "gp": 15,
+        "d1": 0,
+        "d7": 8,
+        "d30": 26,
+        "pts": 51,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "A. Panarin",
+        "nhl": "LA",
+        "gp": 17,
+        "d1": 0,
+        "d7": 1,
+        "d30": 24,
+        "pts": 32,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "B. Hagel",
+        "nhl": "TB",
+        "gp": 20,
+        "d1": 0,
+        "d7": 10,
+        "d30": 23,
+        "pts": 42,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "M. Zibanejad",
+        "nhl": "NYR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 8,
+        "d30": 17,
+        "pts": 31,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "A. Tuch",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 0,
+        "d30": 16,
+        "pts": 37,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "S. Stamkos",
+        "nhl": "NSH",
+        "gp": 21,
+        "d1": 0,
+        "d7": 6,
+        "d30": 27,
+        "pts": 43,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "J. Tavares",
+        "nhl": "TOR",
+        "gp": 12,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 10,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "E. Malkin",
+        "nhl": "PIT",
+        "gp": 18,
+        "d1": 0,
+        "d7": 1,
+        "d30": 11,
+        "pts": 25,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "M. Knies",
+        "nhl": "CBJ",
+        "gp": 18,
+        "d1": 0,
+        "d7": 5,
+        "d30": 8,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "R. O'Reilly",
+        "nhl": "NSH",
+        "gp": 21,
+        "d1": 0,
+        "d7": 5,
+        "d30": 22,
+        "pts": 37,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "R. Rakell",
+        "nhl": "PIT",
+        "gp": 20,
+        "d1": 0,
+        "d7": 1,
+        "d30": 20,
+        "pts": 22,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "T. Bertuzzi",
+        "nhl": "CHI",
+        "gp": 20,
+        "d1": 0,
+        "d7": 2,
+        "d30": 3,
+        "pts": 10,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "T. Meier",
+        "nhl": "NJ",
+        "gp": 21,
+        "d1": 0,
+        "d7": 4,
+        "d30": 11,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 17,
+        "name": "Q. Hughes",
+        "nhl": "MIN",
+        "gp": 22,
+        "d1": 0,
+        "d7": 5,
+        "d30": 26,
+        "pts": 43,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "Y. Chinakhov",
+        "nhl": "PIT",
+        "gp": 16,
+        "d1": 0,
+        "d7": 1,
+        "d30": 9,
+        "pts": 13,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "M. Duchene",
+        "nhl": "DAL",
+        "gp": 0,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 0,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 20,
+        "name": "P. Buchnevich",
+        "nhl": "STL",
+        "gp": 19,
+        "d1": 0,
+        "d7": 0,
+        "d30": 5,
+        "pts": 11,
+        "status": ""
+      }
+    ],
+    "FLY_98": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "M. Celebrini",
+        "nhl": "SJ",
+        "gp": 21,
+        "d1": 0,
+        "d7": 8,
+        "d30": 26,
+        "pts": 41,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 2,
+        "name": "W. Johnston",
+        "nhl": "DAL",
+        "gp": 18,
+        "d1": 0,
+        "d7": 5,
+        "d30": 23,
+        "pts": 27,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "W. Nylander",
+        "nhl": "TOR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 0,
+        "d30": 18,
+        "pts": 37,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 4,
+        "name": "N. Suzuki",
+        "nhl": "MTL",
+        "gp": 15,
+        "d1": 0,
+        "d7": 4,
+        "d30": 11,
+        "pts": 26,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 5,
+        "name": "C. Hellebuyck",
+        "nhl": "NJ",
+        "gp": 7,
+        "d1": 0,
+        "d7": 6,
+        "d30": 26,
+        "pts": 26,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "B. Point",
+        "nhl": "TB",
+        "gp": 17,
+        "d1": 0,
+        "d7": 0,
+        "d30": 16,
+        "pts": 23,
+        "status": "IR"
+      },
+      {
+        "pos": "G",
+        "rnd": 8,
+        "name": "J. Wallstedt",
+        "nhl": "MIN",
+        "gp": 19,
+        "d1": 0,
+        "d7": 9,
+        "d30": 27,
+        "pts": 42,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "L. Cooley",
+        "nhl": "UTA",
+        "gp": 19,
+        "d1": 1,
+        "d7": 1,
+        "d30": 28,
+        "pts": 39,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "T. Zegras",
+        "nhl": "PHI",
+        "gp": 23,
+        "d1": 0,
+        "d7": 2,
+        "d30": 17,
+        "pts": 23,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "A. Fantilli",
+        "nhl": "CBJ",
+        "gp": 18,
+        "d1": 0,
+        "d7": 2,
+        "d30": 12,
+        "pts": 15,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 12,
+        "name": "R. Dahlin",
+        "nhl": "BUF",
+        "gp": 17,
+        "d1": 0,
+        "d7": 1,
+        "d30": 10,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "E. Pettersson",
+        "nhl": "VAN",
+        "gp": 23,
+        "d1": 0,
+        "d7": 6,
+        "d30": 18,
+        "pts": 34,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "J. Kyrou",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 0,
+        "d30": 14,
+        "pts": 21,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "R. Leonard",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 6,
+        "d30": 12,
+        "pts": 24,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "T. Hertl",
+        "nhl": "VGK",
+        "gp": 22,
+        "d1": 0,
+        "d7": 3,
+        "d30": 19,
+        "pts": 33,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "I. Stenberg",
+        "nhl": "SJ",
+        "gp": 23,
+        "d1": 0,
+        "d7": 5,
+        "d30": 16,
+        "pts": 26,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "R. Nugent-Hopkins",
+        "nhl": "EDM",
+        "gp": 12,
+        "d1": 0,
+        "d7": 0,
+        "d30": 20,
+        "pts": 20,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "P. Kane",
+        "nhl": "CHI",
+        "gp": 17,
+        "d1": 0,
+        "d7": 1,
+        "d30": 5,
+        "pts": 11,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 20,
+        "name": "N. Kadri",
+        "nhl": "COL",
+        "gp": 21,
+        "d1": 0,
+        "d7": 3,
+        "d30": 21,
+        "pts": 27,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 21,
+        "name": "Z. Benson",
+        "nhl": "BUF",
+        "gp": 20,
+        "d1": 0,
+        "d7": 0,
+        "d30": 13,
+        "pts": 19,
+        "status": "R"
+      }
+    ],
+    "SHARKDARK": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "J. Robertson",
+        "nhl": "DAL",
+        "gp": 20,
+        "d1": 0,
+        "d7": 6,
+        "d30": 26,
+        "pts": 41,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 2,
+        "name": "C. Caufield",
+        "nhl": "MTL",
+        "gp": 21,
+        "d1": 0,
+        "d7": 4,
+        "d30": 26,
+        "pts": 39,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "J. Guentzel",
+        "nhl": "TB",
+        "gp": 20,
+        "d1": 0,
+        "d7": 9,
+        "d30": 26,
+        "pts": 42,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 4,
+        "name": "L. Thompson",
+        "nhl": "WSH",
+        "gp": 13,
+        "d1": 0,
+        "d7": 3,
+        "d30": 9,
+        "pts": 21,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "C. Keller",
+        "nhl": "UTA",
+        "gp": 22,
+        "d1": 1,
+        "d7": 4,
+        "d30": 19,
+        "pts": 35,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "K. Marchenko",
+        "nhl": "TOR",
+        "gp": 14,
+        "d1": 0,
+        "d7": 0,
+        "d30": 9,
+        "pts": 24,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "S. Aho",
+        "nhl": "CAR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 8,
+        "d30": 28,
+        "pts": 53,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "P. Dorofeyev",
+        "nhl": "NYR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 1,
+        "d30": 15,
+        "pts": 24,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "G. Vilardi",
+        "nhl": "WIN",
+        "gp": 21,
+        "d1": 0,
+        "d7": 7,
+        "d30": 14,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "J. Bratt",
+        "nhl": "NJ",
+        "gp": 21,
+        "d1": 0,
+        "d7": 4,
+        "d30": 18,
+        "pts": 28,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "N. Ehlers",
+        "nhl": "CAR",
+        "gp": 21,
+        "d1": 0,
+        "d7": 6,
+        "d30": 20,
+        "pts": 29,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 12,
+        "name": "P. Zacha",
+        "nhl": "BOS",
+        "gp": 19,
+        "d1": 0,
+        "d7": 1,
+        "d30": 14,
+        "pts": 23,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "W. Eklund",
+        "nhl": "OTT",
+        "gp": 4,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 3,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "A. Protas",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 3,
+        "d30": 12,
+        "pts": 14,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "A. Cirelli",
+        "nhl": "TB",
+        "gp": 18,
+        "d1": 0,
+        "d7": 3,
+        "d30": 20,
+        "pts": 24,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "J. Eriksson Ek",
+        "nhl": "MIN",
+        "gp": 22,
+        "d1": 0,
+        "d7": 0,
+        "d30": 20,
+        "pts": 26,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "I. Barbashev",
+        "nhl": "VGK",
+        "gp": 22,
+        "d1": 0,
+        "d7": 7,
+        "d30": 15,
+        "pts": 22,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "R. Kantserov",
+        "nhl": "CHI",
+        "gp": 20,
+        "d1": 0,
+        "d7": 1,
+        "d30": 16,
+        "pts": 23,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 19,
+        "name": "M. Marchment",
+        "nhl": "SJ",
+        "gp": 23,
+        "d1": 0,
+        "d7": 4,
+        "d30": 13,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 20,
+        "name": "U. Luukkonen",
+        "nhl": "BUF",
+        "gp": 12,
+        "d1": 0,
+        "d7": 0,
+        "d30": 6,
+        "pts": 16,
+        "status": ""
+      }
+    ],
+    "RAY77": [
+      {
+        "pos": "F",
+        "rnd": 1,
+        "name": "K. Kaprizov",
+        "nhl": "MIN",
+        "gp": 22,
+        "d1": 0,
+        "d7": 10,
+        "d30": 41,
+        "pts": 68,
+        "status": ""
+      },
+      {
+        "pos": "G",
+        "rnd": 2,
+        "name": "J. Markstrom",
+        "nhl": "FLA",
+        "gp": 11,
+        "d1": 0,
+        "d7": 6,
+        "d30": 9,
+        "pts": 23,
+        "status": "DTD"
+      },
+      {
+        "pos": "F",
+        "rnd": 3,
+        "name": "K. Connor",
+        "nhl": "WIN",
+        "gp": 21,
+        "d1": 0,
+        "d7": 12,
+        "d30": 27,
+        "pts": 54,
+        "status": "R"
+      },
+      {
+        "pos": "G",
+        "rnd": 4,
+        "name": "K. Vejmelka",
+        "nhl": "UTA",
+        "gp": 16,
+        "d1": 0,
+        "d7": 7,
+        "d30": 10,
+        "pts": 30,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 5,
+        "name": "M. Tkachuk",
+        "nhl": "FLA",
+        "gp": 22,
+        "d1": 0,
+        "d7": 6,
+        "d30": 20,
+        "pts": 39,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 6,
+        "name": "M. Marner",
+        "nhl": "VGK",
+        "gp": 20,
+        "d1": 0,
+        "d7": 6,
+        "d30": 19,
+        "pts": 35,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 7,
+        "name": "A. Ovechkin",
+        "nhl": "WSH",
+        "gp": 18,
+        "d1": 0,
+        "d7": 1,
+        "d30": 1,
+        "pts": 6,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 8,
+        "name": "I. Demidov",
+        "nhl": "MTL",
+        "gp": 2,
+        "d1": 0,
+        "d7": 0,
+        "d30": 0,
+        "pts": 3,
+        "status": "DTD+IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 9,
+        "name": "Z. Hyman",
+        "nhl": "EDM",
+        "gp": 11,
+        "d1": 0,
+        "d7": 9,
+        "d30": 10,
+        "pts": 13,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 10,
+        "name": "L. Raymond",
+        "nhl": "DET",
+        "gp": 21,
+        "d1": 0,
+        "d7": 9,
+        "d30": 34,
+        "pts": 38,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 11,
+        "name": "B. Rust",
+        "nhl": "PIT",
+        "gp": 7,
+        "d1": 0,
+        "d7": 0,
+        "d30": 2,
+        "pts": 8,
+        "status": "DTD+IR"
+      },
+      {
+        "pos": "D",
+        "rnd": 12,
+        "name": "M. Schaefer",
+        "nhl": "NYI",
+        "gp": 19,
+        "d1": 0,
+        "d7": 6,
+        "d30": 23,
+        "pts": 30,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 13,
+        "name": "J. Peterka",
+        "nhl": "BOS",
+        "gp": 20,
+        "d1": 0,
+        "d7": 0,
+        "d30": 10,
+        "pts": 21,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 14,
+        "name": "C. Kreider",
+        "nhl": "MTL",
+        "gp": 19,
+        "d1": 0,
+        "d7": 0,
+        "d30": 9,
+        "pts": 14,
+        "status": "IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 15,
+        "name": "Q. Byfield",
+        "nhl": "LA",
+        "gp": 16,
+        "d1": 0,
+        "d7": 3,
+        "d30": 16,
+        "pts": 20,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 16,
+        "name": "A. Lafrenière",
+        "nhl": "NYR",
+        "gp": 22,
+        "d1": 0,
+        "d7": 5,
+        "d30": 14,
+        "pts": 36,
+        "status": ""
+      },
+      {
+        "pos": "F",
+        "rnd": 17,
+        "name": "A. Mantha",
+        "nhl": "NJ",
+        "gp": 17,
+        "d1": 0,
+        "d7": 0,
+        "d30": 12,
+        "pts": 15,
+        "status": "DTD+IR"
+      },
+      {
+        "pos": "F",
+        "rnd": 18,
+        "name": "V. Trocheck",
+        "nhl": "UTA",
+        "gp": 22,
+        "d1": 3,
+        "d7": 3,
+        "d30": 11,
+        "pts": 17,
+        "status": ""
+      },
+      {
+        "pos": "D",
+        "rnd": 19,
+        "name": "A. Fox",
+        "nhl": "NYR",
+        "gp": 22,
+        "d1": 1,
+        "d7": 2,
+        "d30": 18,
+        "pts": 27,
+        "status": "R"
+      },
+      {
+        "pos": "F",
+        "rnd": 20,
+        "name": "P. Dubois",
+        "nhl": "WSH",
+        "gp": 13,
+        "d1": 0,
+        "d7": 6,
+        "d30": 14,
+        "pts": 19,
+        "status": ""
+      }
+    ]
+  }
 };
     const NHL_LOGOS = {
   "SJS": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgNjQwIj48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJNNTE5LjMyNiA1MzkuNDYzYy02Ljg5NyAwLTEyLjQ5NyA1LjU5MS0xMi40OTcgMTIuNDk0IDAgNi44OTMgNS42IDEyLjQ5MiAxMi40OTcgMTIuNDkyczEyLjQ4OC01LjU5OSAxMi40ODgtMTIuNDkyYzAtNi45MDMtNS41OTEtMTIuNDk0LTEyLjQ4OC0xMi40OTRtMCAyMi4zMDZhOS44MDQgOS44MDQgMCAwIDEtOS44MTMtOS44MTIgOS44IDkuOCAwIDAgMSA5LjgxMy05LjgwN2M1LjQyMSAwIDkuODEgNC4zODUgOS44MSA5LjgwN3MtNC4zODkgOS44MTItOS44MSA5LjgxMm01LjEzMy0xMi43MDlhNC4yMzUgNC4yMzUgMCAwIDAtNC4yMzktNC4yMzJoLTYuMDJ2MTQuMjZoMi42NzZ2LTUuNzkxaDEuOTIxbDIuNzAzIDUuNzkxaDIuOTU5bC0yLjgyMi02LjAzOWE0LjI0IDQuMjQgMCAwIDAgMi44MjItMy45ODltLTQuMjM5IDEuNTU5aC0zLjM0NHYtMy4xMmgzLjM0NGMuODU5IDAgMS41NjMuNjk5IDEuNTYzIDEuNTYyYTEuNTYgMS41NiAwIDAgMS0xLjU2MyAxLjU1OCIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im03NTkuNTQzIDI2MS4zNzItOC42NTggMTUuNDEzIDEuNDI3IDguOTU2Yy0yMi45MSA0NC44Ny00Ny44OTcgODYuNTEzLTU2Ljg0NyAxMDEuMTY3LTMuNDY5LTcuODY2LTguMDQzLTEyLjUxMy0xNi44OTQtMTcuMjQ3IDAgMCA0MC42NTUtNzMuNzY3IDUxLjY0OS0xMzIuMjY5LTMwLjc1IDE1LjIyOS02Mi45NiAzMC4yOTMtNjIuOTYgMzAuMjkzbDU1LjA5NC04OS4xMzFzLTEwNS45NDMgMjMuMTc1LTE4OS43NTYgMzEuNTM2QzQ0Mi4yNDYgNzYuOTc5IDM2MC4wOTUgNTMuNSAzNjAuMDk1IDUzLjVzNTYuOSA5My4xNzIgNjcuNDc5IDE1OC4zMThjLTExNS4yMjUtMTAuODE3LTIwOS4xOTItMzMuMjY0LTIwOS4xOTItMzMuMjY0bDEwMC4zMjUgMTYyLjI3OWMtNTguNzA1IDMuNDg0LTE1Ny40NzIgNi42NzktMTU3LjQ3MiA2LjY3OSAyNS4xNzYgMjUuMTczIDEwNi4xNTggNTcuMDg0IDIxMy4yNTggODMuNTQ0bDE5LjExIDMwLjkyOWMtNjIuOTg4IDQ3LjQ3OC0xMDAuOTU3IDExMi44NS0xMDAuOTU3IDExMi44NWw2LjM2NCAxMS42NjVzMzEuMjYxLTEuODY5IDY5LjYwNi0zLjIzNWMwIDAgMTAuNDM3LTMzLjY5NSA1My4zNDktNzUuMzk4bDQ4LjQxMSA3OC4zMTMgNjAuNzExLTk4LjIgNi42MS0uNzY2IDMuNjY5IDIuMjAzYy0xLjAwNCAxLjAwMi0xLjY4IDIuOTM4LTMuMTIzIDUuMjQyIDUuMDM3IDMuNDI1IDUuMTgyIDMuOTk1IDUuNDIzIDEwLjA5MiAwIDAgNi43MDYgMi4zNjIgMTQuOTkyLS4zNTdsMi4zMDctNC4xNjEgMi44MjMgMS4yNzZjLjM1MyAyLjk1IDEuMTcyIDYuMTYyIDEuMTcyIDYuMTYyIDcuNzIzIDMuNjMzIDE0LjI2LTEuMTkzIDE0LjI2LTEuMTkzIDIwLjYxNyA0LjIzOSAzNC41NjQgMS44MjIgMzkuMTg1LjcgMjAuNCA1LjYxNiAzMy42MDcgMS44MTcgMzkuMDgtLjU1OCA5LjM3OSAzLjg3NyAxOS4wOTYgNi4zOTQgNDYuMDIgNi4zOTQgMTIuNDE0IDAgMjUuNjQtLjc2NiAyNS42NC0xMC4wMjcgMC0xMy4wMDEtMTIuNDI3LTYwLjcyOS0yNS4wMzMtODcuMTQgMCAwIDkuMjU1IDYuNTEzIDE3LjU2IDguMTc0bDExLjUyOC04LjM0MWMtNS4yMzYtNi4xNTUtNC4yNDEtNy45NTQtMy41NDEtMTIuNzIzLTQuMTExLTMuNDg0LTkuODY2LTQuMjkyLTkuODY2LTQuMjkyIDExLjI3LTEyLjkzOCAzNC44MTQtNDMuMTE5IDYyLjk1OS05Ny4xMzcgNS45MTgtLjg5NiAxMy41LTQuMzcyIDE0LjQxLTEzLjY5MiAxLjAwMy0xMC4xNDggMS42MDMtMTQuNTIzIDEuNjAzLTI0LjE2Ni0xNy44MTgtOC4xNi0zOS4yMjItMi4yOTktMzkuMjIyLTIuMjk5eiIvPjxwYXRoIGZpbGw9IiMwMTAxMDEiIGQ9Im02ODkuODE3IDIwMS40MzUtNTAuODU0IDgxLjIzNWEyNzUyIDI3NTIgMCAwIDEgMTcuMjctNy45MjFsNTQuMjctODcuNzg3cy05Mi4zMiAyMC4xNjYtMTc2LjM1NCAyOC42ODZjMiAzLjExNyAzLjk1NiA2LjI1NSA1Ljg5NSA5LjQzNiA1Ny43MDEtNi4wOSAxMTcuOTA1LTE3LjI2OCAxNDkuNzczLTIzLjY0OSIvPjxwYXRoIGZpbGw9IiMwMTAxMDEiIGQ9Ik02OTcuOTQ0IDQxNi4xMTRjLTcuMDIzLTI5LjIwNi04LjE2OC0zNC41MzktMjMuNjc3LTQyLjM4NGwtMi41Ny0zLjI5MmMyOC41OS01MS4xOTYgNDkuMjg2LTExMi4yODkgNDkuMjg2LTExOS42MDEgMC0xLjc3Mi0uODE5LTIuMjk3LTEuODg0LTEuNzQ0LTQ1LjQ4NSAyMy4wNTktOTUuNDM3IDQzLjYzMi0xMDYuNDg0IDUxLjM0OWwtMi45NjMgNC4wOTRjLTI0LjQ1OC0yMS43OTQtNDUuNDQtMzcuMTE4LTUzLjU1OC00Mi44MjktNTAuODQ4LTk5Ljc3LTEyOC44NTUtMTY5LjktMTc5LjExLTE5NS4wMiAwIDEwLjQxOSA0OS43NDIgODYuOTkzIDU3LjM2NCAxNTEuMzM4LTg5Ljk3OC02LjEzMy0yMDQuMTA1LTMxLjA2My0yMDQuMTA1LTMxLjA2M2w5OC4yNjUgMTU4Ljk2NGMtODAuNyA0Ljk0NS0xNTEuNDk3IDYuNjE1LTE1MS40OTcgNi42MTUgMCA1LjYxMSA5MC4xMTcgNDguNzAzIDIyMy4xNjYgNzguNzkzIDI5LjA5NSA2LjU5NiA1MC43NjkgNS41NSA2NC45MzkgNS41NWE1NDYgNTQ2IDAgMCAwLTcuOTI5LTguNTI0YzE5LjI4OCAxMS43NiAzNi44NzcgMjMuNDg0IDUyLjcxNiAzNC4wMjEtMy45NzQuMDU0LTguMzA1LjA3Mi0xMy4wNzguMDcyLTMxLjk5MSAwLTU2LjE3Ni0xLjY2OC03MS40ODYtMi44Mi0zLjc5My0uMjkyLTcuMDYxLS41MzUtOS43MzktLjcyNS0xLjM1OS0uMDgzLTIuNTU1LS4xNDgtMy42MTgtLjIwOGwtMTUuMDUyLTI0LjA0MmMtNi4wNjktMS4zNC0xMS44NzItMi43NTUtMTUuODc3LTMuNzMzbDIwLjExMyAzMi41MTljLTE4Ljc4NiAxMy41MTEtNjcuMDI1IDU0LjQ2MS0xMDEuOTY2IDExMS41MzhsMy4wNTQgNS42MzRzMzMuNzYtMi4wOTUgNjIuMjk5LTIuOTAyYzAgMCAxMi43OTktMzYuNTA5IDU4LjU2OS03OC43NTJsNDcuMjU0IDc2LjQwNyA1Ny4zMjItOTIuNzI2YTg3MSA4NzEgMCAwIDAgMTEuMjk5LTEuM2MzLjk2OSAyLjQ4NiA3Ljc5OCA0LjgyIDExLjQ0NiA2LjkyMS0xLjk1OSAxLjE2OS0zLjYwNyAyLjY3Mi00Ljg3NCA0LjkyMiAwIDAgMy4zIDIuMjYxIDMuNTE0IDYuNzEzIDAgMCAyLjgzNC40NTcgNS43OTQtLjM3OSAwIDAgMi4wMTgtMy4wNjQgMy43NjctNi43NjIgMy43NTggMS45MTggNy4yOTIgMy41ODUgMTAuNjA1IDQuOTA5LS4wMyAzLjIuNTA4IDUuNTY5LjUwOCA1LjU2OXMzLjY2IDEuMTE2IDguMDU1LTIuODAyYzI1LjQwOCA1Ljc4OCA0MC41OTEuODc5IDQwLjU5MS44NzkgMjUuNzg3IDcuNjM0IDM4Ljg5OC0uOTAzIDM4Ljg5OC0uOTAzIDEwLjEgNC4zOTMgMTguNTQ1IDYuOTI4IDQ2LjIwNSA2LjkyOCAxNS4wMTEgMCAxOS45NjgtMS44MjMgMTkuOTY4LTQuMzUxIDAtMTIuMDY0LTEyLjc3Mi02MS40NjYtMjUuNTMtODYuODc0ek00NzAuMzc1IDUzMS4wMjVsLTI3LjAxLTQyLjgxM2MxMC40OC0uMTkxIDMwLjQ0MS0uODE0IDU1LjgwOC0yLjg1NnoiLz48cGF0aCBmaWxsPSIjMDEwMTAxIiBkPSJtNzA1LjM4OCA0MDcuMTMxLjkxNyAzLjM2N3M4LjI3NiA1LjY0NiAxNC4yNTQgNy4zMTNsNC43NzUtMy40NDNzLTIuNzQ4LTMuNTE0LTEuODg1LTguNjY1Yy02LjIxMi00LjAyOC0xOC4wNjEgMS40MjgtMTguMDYxIDEuNDI4bTU3Ljg5Mi0xNDAuODI5LTYuNDcxIDExLjUzNCAxLjQxIDguODI1Yy0yOS4wMzcgNTcuMTE3LTYxLjM2NyAxMDguODExLTYxLjM2NyAxMDguODExbDMuOTkyIDkuNjk2IDQuNzI4LTMuMjc5IDMuMjMuMjgyczMwLjk1Mi0yOS42MDIgNzAuMzg3LTEwNi4wMzljMCAwIDExLjQxLjM4MyAxMi4zNDUtOC44NjkuOTIzLTkuMzU2IDEuNTY4LTE1Ljg1OSAxLjU2OC0xOS42MDUtMTQuMjAzLTUuMTYyLTI5LjgyMi0xLjM1Ny0yOS44MjItMS4zNTd6Ii8+PHBhdGggZmlsbD0iI2U1NzIwMCIgZD0iTTQzNC40MDcgNDg5LjAwMWMtLjc3MS42NDEtMS40NzMgMS4yOTQtMi4yMjkgMS45NDdsMzguMTk3IDYxLjAwOCA0Mi40MjgtNjcuNzg4Yy0xLjIyMy4xMjUtMi40NjQuMjMyLTMuNjc1LjMzM2wtMzguNzUzIDYxLjk1OHpNNjgzLjU2IDIwNS43NTZsLTQ5LjYwNSA3OS4yNTRjMS42NDUtLjc3MiAzLjMwNy0xLjUzNCA1LjAwOC0yLjMzOWw1MC44NTQtODEuMjM2Yy0zMS44NjcgNi4zODEtOTIuMDcxIDE3LjU1OS0xNDkuNzczIDIzLjY1LjU3Ny45NDkgMS4xNDQgMS45MDkgMS43MiAyLjg2MSA1NC4zMTUtNS44NTQgMTEwLjQzOC0xNi4wNTUgMTQxLjc5Ni0yMi4xOU00MTUuNjAxIDQ1OC45MDlsLTE0LjYzNy0yMy4zNjZjLTEuMzM4LS4yOTEtMi42OTItLjU3Ni00LjAzMy0uODg0bDE1LjA1MSAyNC4wNDJjMS4wNjMuMDU5IDIuMjU5LjEyNCAzLjYxOS4yMDhtMTM1LjQzMiAzOC43MzVjMy45MTUtNS4yODQgNi41NzItOC42NTUgNy4yMDEtMTAuNzc0LTMuNDU1IDEuNTAxLTcuODggMi4zMjYtMTAuMjkxIDUuOTk2IDAgMCAxLjc2MSAxLjcxNSAzLjA5IDQuNzc4bTIwLjEyNCAzLjYyN3MyLjYxMy0uMzM5IDQuODk4LTIuNjNjMCAwLTIuNDI1LTMuNzUxLTMuODczLTcuMjQyLTEuNzIyIDQuMzg3LTEuMDI0IDkuODcyLTEuMDI0IDkuODcyem0tMTIuMDY4LTkyLjUwMWMyLjA5IDE2LjYzNCA2LjA4NCAyMy42ODcgNi4wODQgMjMuNjg3czYuMjcgNC45MDggMTguMjA3IDkuNzk0Yy0xMi4wNTYtMjIuMzAzLTI0LjI5MS0zMy40ODEtMjQuMjkxLTMzLjQ4MU00MjguNSA0ODIuOTkzbDQuODAzLTIuNjg5czE5LjcyNCAzLjE4MSAxMzcuOTE4LTkuMDExYy0yLjgxNS0yLjA0OS00LjIxLTEuNjQ1LTQuMjEtNi4zNDYgMC0xLjUwMy4yNTUtMS43NTItMi4zMjEtMS43NTItMi41NzEgMC0zLjY3NS0uNjgzLTYuNzE3LS42ODMtMy43OSAwLTkuNDQ0IDMuOC02Ny4zNTggMy44LTQ2LjA4IDAtNzguMzY5LTMuODcxLTgwLjUtMy44NzEtMi4xMDQgMC02LjI1NCAzLjk0OC0xOC41OTYgMTMuODczIDAgMCAyNC4yNjktLjMxNCAzNi45ODEgNi42OHptLTYwLjI0NSA3NC4wMzljLTE3Ljc1OS0zLjM5Ni01NC40MzQgMi43MzYtNTQuNDM0IDIuNzM2bC05LjgyOCAxNC4xNyA1Ny40MDUtMi42OTR6bTM5NC45MDQtMjcyLjQwNWMtMTkuMTkzIDM0LjQ2Ny00MC4wNzEgODAuMTUzLTYyLjkxMSAxMDguNDE0bDYuNTgzLTQuMTI2IDEuNDQyLTEuNDI4LTEuMTkgMy44NzYgMi43OS0xLjMyNi00LjE5NyA3LjM5NiAzLjkxLTMuMTM3czE5LjUzNi0yMS45NyA2OC45NDItMTExLjIxNWMtMTAuOTg4LTEuNjY2LTE1LjM2OSAxLjU0Ni0xNS4zNjkgMS41NDZtMi4wMTgtMTMuMzg5LTQuMDA0IDYuMzMzczkuNjczLTEuODQ1IDIyLjU0Ni0uNzY5bDQuNjYtNi41NjVjLTE0LjE3OS0yLjY3NS0yMy4yMDIgMS0yMy4yMDIgMXoiLz48cGF0aCBmaWxsPSIjZTU3MjAwIiBkPSJNNzA0LjIzNCAzOTMuNjk0cy0xLjgyNiAxLjQ4MS00LjY2NCAyLjI3MWwyLjQxIDUuMTA1IDEuNDg4LTEuMTQ5LS41OTQtMS44MzcgMi40ODItNC43Mjl6bTE3LjEzNSAxMy4yNDdjLTQuMDE2LTIuMDg5LTExLjgzNyAxLjAwNS0xMS44MzcgMS4wMDVzNy45MzcgMS44NTggMTIuNDIxIDMuOWMwIDAtLjc5NS0xLjgyOC0uNTg0LTQuOTA1Ii8+PHBhdGggZmlsbD0iIzAwNzc4YiIgZD0iTTQxNS42MDEgNDU4LjkxYzIuNjc3LjE4OSA1Ljk0NS40MzMgOS43MzguNzI0bC0xMy44OTctMjIuMDNjLTMuMjM2LS41NTgtNi44MTUtMS4yODgtMTAuNDc4LTIuMDZ6bTI3Ljc2NCAyOS4zMDJjLTUuMjUxLjA4My04LjEzNS4wNzctOC4xMzUuMDc3LS4yOTIuMjM3LS41NDQuNDgxLS44MjMuNzEybDM1Ljk2OSA1Ny40NTkgMzguNzUyLTYxLjk1OGMtMy40MDcuMzItNi43MTQuNjE2LTkuOTU1Ljg1NGwtMjguNzk4IDQ1LjY2OXptMjI2LjAzMy0yNzIuNzY0LTQ3LjUzNCA3NS4zODljMy41NzYtMS43ODcgNy42ODEtMy43NTIgMTIuMDkyLTUuODI2bDQ5LjYwNC03OS4yNTRjLTMxLjM1OSA2LjEzNS04Ny40ODEgMTYuMzM2LTE0MS43OTYgMjIuMTlhMzYyIDM2MiAwIDAgMSAzLjg1NiA2LjQ4NWM0NC42MzItNC45MTggOTAuMzU0LTEyLjY5MiAxMjMuNzc5LTE4Ljk4NHptLTIzNC4wNDQgMTguMjkzYzAtMy41MTQtLjE2LTcuMDY3LS40NzgtMTAuNjc3LTMwLjkxNyAzLjI3Mi00OS4zNDQgMTAuNTczLTU2LjQyMyAxMy44ODggMTAuODQ5LTMuMDI0IDMwLjA5OC0zLjk1MSA1Ni45MDEtMy4yMTFtMjM0Ljk0OCAxNDIuNTQxcy0zNy42MDctNTIuNzg1LTEwOS45MjUtMTA2LjA0MWM2LjE0NSAxMi43MDkgMTEuODY0IDI1LjgzOCAxNy4wMSAzOS4zOTcuNzMgMS45MDUuNjIyIDMuNTY4LTEuMDAyIDMuNTY4LTE1Ljg0IDAtNzEuNzYtMzAuNzU2LTEyNi42OTItMjUuMjQ2IDI4LjUzIDI3LjE2OSA1Ni44OTQgNjUuMjkzIDI5LjM5MiA1MS4zOTMgMCAwIDI4LjcxNyAxNy43MjIgNjIuNDQ0IDUzLjI2NCAyNS4xMjYgMCAzMC4xMjIgNC4yMzkgMzEuNTk5IDcuNzUyIDIuODYyIDYuNzgzIDcuMDI2IDE4LjgzMiAyMy40NzYgMzguMjMyIDcuNTUgMCA4LjkzMi0uNDkzIDExLjY5Ny03LjI3OCAwIDAgMi4wNTcgOC42NjEtMS43MjQgMTUuMDE0IDM0LjI4NiAyNy4wODggMTAwLjg1OSA1NC4zNzcgMTExLjAzNyA1NC4zNzcgNC4wOTcgMC00LjM0LTM3LjI1Ny0yMy42Mi04Mi4wNTktNi4zLTI4LjM3OC05Ljc3NS0zNi4zMzItMjMuNjkyLTQyLjM3M1ptLTMxMi41MDEtMzIuMjYzczkuODA3IDUuNzY5IDI1LjkwOSAxNy45MjJjLTMuOTUzLTYuODQyLTE0LjM4My0xNC4yODktMjUuODAyLTIxLjIybC0yNS4wNTggMS44MzcgMS44NDkgMi45OTFjNy42NTUtLjQ4OCAxNS4zNTctMS4wMDggMjMuMTAyLTEuNTMxem0xNDcuNTcyIDQzLjg4N2MtMy45NjggMjEuNDQxLjE4NCAzOC42NTEuMTg0IDM4LjY1MS0uNjc5LTcuMTY2IDQuOTctMzEuMTk4IDQuOTctMzEuMTk4em0tMTIuNTktMTIuMjRjLTMuOTUxIDI0LjYwMyAxLjYxNSA0NC4yMyAxLjYxNSA0NC4yMy0xLjE4OC05LjA0MSAzLjUyOC0zNS42NjQgMy41MjgtMzUuNjY0em0tMTIuNDU4LTExLjEzMmMtNC4wNzUgMjYuMjk2IDIuMjc3IDQ3LjI5NCAyLjI3NyA0Ny4yOTQtMS4xODItMTEuOTYzIDIuODc2LTM5LjgzOCAyLjg3Ni0zOS44Mzh6bS0yOC4zNDMtNDMuMzkycy00OC4zNTUtNDAuMDE0LTEwOC4zODQtNTAuMDkxYy0yLjE3IDAtNi41MSA5LjEyNC02LjUxIDkuMTI0czYuMzU2LTUuNzMxIDguMjg4LTUuNzMxYzUxLjQwNiA5Ljg5NSAxMDYuNjA2IDQ2LjY5OCAxMDYuNjA2IDQ2LjY5OCIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik01ODkuODE4IDQ5Mi4zNjFjNy4wMDMtNC4xNDkgMTIuMTM0LTguMDk2IDEyLjEzNC04LjA5Ni0yMy4wOTMgMS4wMDgtMzEuNzk2LTEuODA2LTMxLjc5Ni0xLjgwNiA0LjEzMy00LjEyNSA5LjI5NS03LjY4MSAxMi41NjMtMTAuOTQ2LTIuNDg4LjM5Mi01LjA0NC42NjUtNy41NC44NzgtLjAzIDEuMTIzLTEuMjYyIDIuMzk5LTQuNzg0IDQuNTM2YTc4OCA3ODggMCAwIDEtMjAuNDA0IDMuMDFjMS44OTcgMi4wMTggMy45MjEgMy45ODMgNi4xNjggNS44NDggMS41NjQtLjUxMiAzLjIzMi0xLjAxNiA1LjAxNC0xLjYyMSAwIDEuNDEyLS4zNzcgMy4wNDUtLjkxOCA0LjY3OGE1MSA1MSAwIDAgMCA5LjMzMiA0Ljk5MmMuMzYyLTIuMjYyIDEuMDQyLTQuNjI1IDIuNDEzLTYuNzYyIDEuMTcuMzI3IDEuODA1IDMuNzQ2IDIuNDYxIDQuNjg0IDEuNzEzIDIuNTA2IDMuOTYzIDIuOTE1IDQuMzgxIDQuOTggOS42ODIgMi4yMjcgMjEuOTY1IDIuODQ0IDM4LjE2Mi44MDhsNC40OTQtMy42NDRjLTIzLjY5OC40MjctMzEuNjgtMS41MzgtMzEuNjgtMS41Mzh6bS0zOC4zODEtMzQuNzMzYy0xMC4zNTYgMy4zMDYtMTQuODA2Ljk5MS0xNC44MDYuOTkxIDIuMDMtMi4wMjQgMy4zNDMtNS45OTYgMy4zNDMtNS45OTYtOS4xNjYgMi41NTktMTIuMDA5LjAxMi0xMi4wMDkuMDEyIDEuNDU0LS44NzggMi45MjMtNC4zOTMgMi45MjMtNC4zOTMtMTEuODk3IDAtMTguMzk3IDEuOTYtMTguMzk3IDEuOTYgOS44ODEgMS4yNDEgMTYuMzU1IDUuNTggMjEuODU1IDExLjE4OSA3Ljc1LS41NTIgMTIuNDkzLTEuMjQ2IDE1LjgxNS0xLjc4N3oiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNTMxLjM4NyA0NTEuNjI3czUuMDE5LjMwMiAxMC44MzQtMS43N2MwIDAgLjMwOCAzLjg5NS0yLjMyNSA3LjM5MSAwIDAgNC45MTktLjAzNSAxNS4wMjgtMi4zNzQgMCAwLS44NzIgMi4wMTgtMi4wOTMgNC4yNzMgMS44MjktLjMwMiAzLjIwNy0uNDk4IDQuNjU4LS40OTggMy4yNSAwIDMuNjM5LjY4MyA2LjQ5MS42ODMgNS4zNzkgMCA2LjA0MSAxLjExNiA2LjgzNiA3LjM3OSAxLjA4OSAxLjU5NyAyLjM1MSAyLjY3OCAzLjIxMSAzLjYwOSAzLjk4MS0uMzA4IDguNTY3LS43NDIgMTMuMTc5LTEuMzk1IDAgMC01LjEzMiA3LjEyNC0xMi44NzUgMTIuMzcxIDAgMCAyMS40ODkgMi4wMjUgMzIuNjE5LjYzIDAgMC00LjgwNSA1Ljg2NS0xMS40MTUgOS4yMzYgMCAwIDE0Ljg1My45NSAzMC44MDYuNjc4IDAgMC0zLjEzMSAzLjQ2MS02LjI1IDUuOTc3IDAgMCAxOS43MTQgNC40NDggMzMuNzM3IDEuMTExLTUwLjY0NC0yMC4xNDMtNzguNTE2LTUwLjYzMi0xMjAuOTAyLTUwLjYzMi0uNjI4IDEuNzg3LTEuNTM5IDMuMzMxLTEuNTM5IDMuMzMxTTMyNy4wNyA1NDIuNzkybC0xMS4zOTEgMTQuNTg2czMzLjQ5My01LjIyNSA1My41NzktMi4xNzRsNS41NzYtOS41NjNjLTEwLjk1MS01LjY3NS00Ny43NjMtMi44NDktNDcuNzYzLTIuODQ5eiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0zMzIuMjc3IDUzNi4yNjEtMy41MjkgNC40MjJzMzQuNTc2LTIuNjI5IDQ3LjE5MSAzLjJsOC4yMDQtMTIuMzQ3Yy0xMS4xNzgtMS44MTEtNTEuODY2IDQuNzI1LTUxLjg2NiA0LjcyNW01Ljk4Ni03LjMyNS00LjAyNCA0Ljg4NXM0MS40MTItNi40NTMgNTEuMjA3LTQuMDczbC43MjctLjk5N2MtMTAuMjUyLTMuMzc3LTQ3LjkwOS4xODQtNDcuOTA5LjE4NHptMTMuOTUxLTE2LjAyOS0xMi4wNzcgMTMuNzY3czMzLjU3MS0zLjQ4NiA0Ny4zNTEuMzg1bDEzLjkyNS0xNi4wODdjLTE0LjE0MS0yLjMyNy00OS4xOTkgMS45MzUtNDkuMTk5IDEuOTM1bTE4LjAxMS0xOC4xMTItMTUuOTEyIDE1Ljc5czI5LjM1NS0zLjk3NiA0OC43MTYtMS40MzZsNy42MTEtOC40MDZjLTcuMjUxLTYuMTg1LTQwLjQxNS01Ljk0OC00MC40MTUtNS45NDgiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMzczLjI0NCA0OTIuMDQxLS44MzQuNzU0czI4LjYzNC0uNDQgMzkuNjIyIDYuNDIzbDEuNjUxLTEuNzM5Yy04Ljg4NC01LjA0Ny00MC40MzktNS40MzgtNDAuNDM5LTUuNDM4bTE1LjgyMy0xMy42NzgtMTMuNjcxIDExLjc0M3MzMS44OTcuNTgxIDM5LjcyNiA1Ljg0NmwxMS43NTQtMTEuNTkyYy0xMC4zMzItNS44NjYtMzcuODA5LTUuOTk3LTM3LjgwOS01Ljk5N20tMTguMjg0IDc4LjEyMy40MzMgMi44OTIgNC41NjktOC4wMi0uNDQ1LTIuNzc0em02LjA4NS0xMC40NDIuNDY5IDIuNzczIDcuNjg4LTExLjIzMi0uNTAyLTMuMTd6bTkuMjQ5LTEzLjg4NC41NDEgMy4zMTIuNzM5LS45NS0uNjM2LTMuMjQ4em0yLjIyMy0yLjk3NS42NSAzLjM3MiAxMy4wNzUtMTQuNzE2LS41NDktNC4wMTR6bTE0Ljg3MS0xNy4yNjMuNTczIDQuMDQzIDcuOTAzLTguNDQ4LS45OTktMy44NjR6bTkuMDUtOS45NzkgMS4wMDkgMy45MTEgMS41MzgtMS42MDItLjU0Ni00LjQ4MnptMy43MTktMy45ODkuNTY0IDQuNTM1IDEwLjM4NS0xMC4xODctLjEyNy01LjI3N3oiLz48L3N2Zz4=",
@@ -1019,6 +3060,69 @@
     let selectedWeekIdx = POOL_DATA.weeks.length - 1;
     let currentSort = { key: 'rank', asc: true };
     let activeTeams = new Set(POOL_DATA.teams.map(t => t.id));
+
+    // Pré-calcul des statistiques par ronde et de l'ordre exact des 160 choix du repêchage
+    function computeDraftAnalytics() {
+      const rosters = POOL_DATA.rosters || {};
+      const teamsById = {};
+      POOL_DATA.teams.forEach(t => { teamsById[t.id] = t; });
+
+      // Regrouper tous les joueurs par ronde telle qu'affichée dans PoolExpert (1 à 21)
+      const byRound = {};
+      Object.entries(rosters).forEach(([teamId, players]) => {
+        players.forEach(p => {
+          if (!byRound[p.rnd]) byRound[p.rnd] = [];
+          byRound[p.rnd].push({ ...p, teamId, team: teamsById[teamId] });
+        });
+      });
+
+      // Calculer Rang dans la ronde, Max de la ronde, Min de la ronde
+      const roundStats = {};
+      Object.entries(byRound).forEach(([rndStr, list]) => {
+        const rnd = parseInt(rndStr, 10);
+        const ptsList = list.map(x => x.pts);
+        const maxPts = Math.max(...ptsList);
+        const minPts = Math.min(...ptsList);
+        const sortedPtsDesc = [...ptsList].sort((a, b) => b - a);
+
+        roundStats[rnd] = {
+          count: list.length,
+          maxPts,
+          minPts,
+          getRank: (pts) => sortedPtsDesc.indexOf(pts) + 1
+        };
+      });
+
+      // Construire l'ordre serpentin exact des 160 choix (Rondes 1 à 20 + Ronde 21)
+      const orderR1 = POOL_DATA.draft_order_r1 || ['OLIV', 'KHELDAR', 'COCO', 'BRICIUS', 'FLY_98', 'SHARKDARK', 'RAY77', 'PENS73'];
+      const picksInOrder = [];
+      let overallPick = 1;
+
+      for (let rnd = 1; rnd <= 21; rnd++) {
+        const teamOrder = (rnd % 2 === 1) ? [...orderR1] : [...orderR1].reverse();
+        teamOrder.forEach((teamId, slotIdx) => {
+          const teamPlayers = rosters[teamId] || [];
+          const p = teamPlayers.find(pl => pl.rnd === rnd);
+          if (p) {
+            const rs = roundStats[rnd];
+            picksInOrder.push({
+              overall: overallPick++,
+              rnd,
+              slotInRound: slotIdx + 1,
+              teamId,
+              team: teamsById[teamId],
+              ...p,
+              rndRank: rs.getRank(p.pts),
+              rndCount: rs.count,
+              rndMax: rs.maxPts,
+              rndMin: rs.minPts
+            });
+          }
+        });
+      }
+
+      return { roundStats, picksInOrder, teamsById };
+    }
 
     // Calcul des statistiques cumulatives par semaine
     function computeTimeline(maxWeekIdx) {
@@ -1094,7 +3198,10 @@
 
       renderTeamFilters();
       renderAll();
-      window.addEventListener('resize', () => renderCharts(computeTimeline(selectedWeekIdx)));
+      window.addEventListener('resize', () => {
+        renderCharts(computeTimeline(selectedWeekIdx));
+        renderDraftSection();
+      });
     }
 
     function onWeekChange() {
@@ -1112,8 +3219,7 @@
     }
 
     function renderTeamFilters() {
-      const container = document.getElementById('team-filters');
-      container.innerHTML = POOL_DATA.teams.map(t => {
+      const html = POOL_DATA.teams.map(t => {
         const isActive = activeTeams.has(t.id);
         const logoSrc = NHL_LOGOS[t.nhl_team] || '';
         const logoImg = logoSrc ? `<img class="chip-logo" src="${logoSrc}" alt="${t.nhl_team}" />` : '';
@@ -1123,6 +3229,10 @@
           <span>${t.name}</span>
         </div>`;
       }).join('');
+      const c1 = document.getElementById('team-filters');
+      const c2 = document.getElementById('draft-team-filters');
+      if (c1) c1.innerHTML = html;
+      if (c2) c2.innerHTML = html;
     }
 
     function toggleTeam(teamId) {
@@ -1133,6 +3243,7 @@
       }
       renderTeamFilters();
       renderCharts(computeTimeline(selectedWeekIdx));
+      renderDraftOrderChart();
     }
 
     function toggleAllTeams(enable) {
@@ -1143,6 +3254,7 @@
       }
       renderTeamFilters();
       renderCharts(computeTimeline(selectedWeekIdx));
+      renderDraftOrderChart();
     }
 
     function sortTable(key) {
@@ -1165,6 +3277,7 @@
       renderStandingsTable(timeline);
       renderCharts(timeline);
       renderWeeklyMatrix(timeline);
+      renderDraftSection();
     }
 
     function renderKPIs(timeline) {
@@ -1385,7 +3498,7 @@
       </svg>`;
     }
 
-    // Nuage de points Points vs Matchs joués (avec logos LNH)
+    // Nuage de points Points vs Matchs joués
     function renderScatterChart(containerId, timeline) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -1557,6 +3670,228 @@
       container.innerHTML = `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
     }
 
+    // Graphique en bâtons des 160 joueurs dans l'ordre du repêchage + Alignements
+    function renderDraftOrderChart() {
+      const container = document.getElementById('chart-draft-order');
+      if (!container || !POOL_DATA.rosters) return;
+      const { picksInOrder } = computeDraftAnalytics();
+
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 1100, 600);
+      const height = 460;
+      const pad = { top: 30, right: 28, bottom: 72, left: 56 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+
+      const maxPts = Math.ceil(Math.max(...picksInOrder.map(p => p.pts), 80) / 10) * 10;
+      const yFor = (v) => pad.top + plotH - (v / maxPts) * plotH;
+      const stepX = plotW / picksInOrder.length;
+      const barW = Math.max(stepX - 1.4, 2);
+
+      // Grille Y
+      let gridSvg = '';
+      for (let s = 0; s <= 4; s++) {
+        const val = (s / 4) * maxPts;
+        const y = yFor(val);
+        gridSvg += `
+          <line x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />
+          <text x="${pad.left - 10}" y="${y + 4}" fill="#94a3b8" font-size="11.5" text-anchor="end">${Math.round(val)} pts</text>
+        `;
+      }
+
+      // Séparateurs de rondes et barres
+      let roundDividersSvg = '';
+      let barsSvg = '';
+      let prevRound = null;
+      let roundStartIdx = 0;
+
+      picksInOrder.forEach((pk, idx) => {
+        const x = pad.left + idx * stepX;
+
+        if (pk.rnd !== prevRound) {
+          if (prevRound !== null) {
+            const midX = pad.left + ((roundStartIdx + idx) / 2) * stepX;
+            roundDividersSvg += `
+              <line x1="${x.toFixed(1)}" y1="${pad.top}" x2="${x.toFixed(1)}" y2="${pad.top + plotH + 22}" stroke="rgba(255,255,255,0.18)" stroke-dasharray="2,3" />
+              <text x="${midX.toFixed(1)}" y="${pad.top + plotH + 18}" fill="#94a3b8" font-size="10.5" font-weight="700" text-anchor="middle">R${prevRound}</text>
+            `;
+          }
+          prevRound = pk.rnd;
+          roundStartIdx = idx;
+        }
+
+        const isVisible = activeTeams.has(pk.teamId);
+        const y = yFor(pk.pts);
+        const h = Math.max(pad.top + plotH - y, 2);
+        const opacity = isVisible ? (pk.rndRank === 1 ? '1' : '0.88') : '0.12';
+        const stroke = (isVisible && pk.rndRank === 1) ? '#fbbf24' : 'none';
+
+        const tipHtml = encodeURIComponent(
+          `<strong>#${pk.overall} • ${pk.name} (${pk.nhl})</strong><br/>` +
+          `Pooler : <b style="color:${pk.team.color}">${pk.team.name}</b><br/>` +
+          `Ronde ${pk.rnd} (Rang <b>${pk.rndRank}/${pk.rndCount}</b> de la ronde)<br/>` +
+          `Points : <b>${pk.pts} pts</b> en ${pk.gp} MJ<br/>` +
+          `<span style="color:#94a3b8">Max Ronde ${pk.rnd} : ${pk.rndMax} pts | Min : ${pk.rndMin} pts</span>`
+        );
+
+        barsSvg += `
+          <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5"
+            fill="${pk.team.color}" opacity="${opacity}" stroke="${stroke}" stroke-width="1"
+            style="cursor:pointer"
+            onmouseenter="showTooltip(event, decodeURIComponent('${tipHtml}'))"
+            onmousemove="moveTooltip(event)"
+            onmouseleave="hideTooltip()" />
+        `;
+      });
+
+      // Dernier label de ronde (R21)
+      if (prevRound !== null) {
+        const midX = pad.left + ((roundStartIdx + picksInOrder.length) / 2) * stepX;
+        roundDividersSvg += `
+          <text x="${midX.toFixed(1)}" y="${pad.top + plotH + 18}" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="middle">R${prevRound}</text>
+        `;
+      }
+
+      // Repères de numéro de choix global (#1, #20, #40, ..., #160)
+      let pickTicksSvg = '';
+      [1, 20, 40, 60, 80, 100, 120, 140, 160].forEach(pNum => {
+        const x = pad.left + (pNum - 0.5) * stepX;
+        pickTicksSvg += `<text x="${x.toFixed(1)}" y="${height - 14}" fill="#64748b" font-size="11" text-anchor="middle">Choix #${pNum}</text>`;
+      });
+
+      container.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}">
+        ${gridSvg}
+        ${roundDividersSvg}
+        ${barsSvg}
+        ${pickTicksSvg}
+      </svg>`;
+    }
+
+    function formatStatusBadge(st) {
+      if (!st) return '';
+      let html = '';
+      if (st.includes('R')) html += `<span class="status-icon" title="Recrue / Contrat d'entrée">⭐</span>`;
+      if (st.includes('IR')) html += `<span class="status-icon" title="Liste des blessés (IR)" style="color:#ef4444;font-weight:900;">✚</span>`;
+      if (st.includes('DTD')) html += `<span class="status-icon" title="Au jour le jour (Day-to-Day)" style="color:#38bdf8;">🧤</span>`;
+      return html;
+    }
+
+    function renderDraftSection() {
+      if (!POOL_DATA.rosters) return;
+      renderDraftOrderChart();
+
+      const { roundStats, teamsById } = computeDraftAnalytics();
+      const container = document.getElementById('rosters-container');
+      if (!container) return;
+
+      // Trier les équipes selon le total de points de leur alignement (comme dans le rapport PoolExpert)
+      const teamOrder = Object.keys(POOL_DATA.rosters).sort((a, b) => {
+        const ptsA = POOL_DATA.rosters[a].reduce((s, p) => s + p.pts, 0);
+        const ptsB = POOL_DATA.rosters[b].reduce((s, p) => s + p.pts, 0);
+        return ptsB - ptsA;
+      });
+
+      container.innerHTML = teamOrder.map((teamId, idx) => {
+        const tm = teamsById[teamId];
+        const players = POOL_DATA.rosters[teamId];
+
+        let totGP = 0, totD1 = 0, totD7 = 0, totD30 = 0, totPts = 0;
+        let firstInRoundCount = 0;
+
+        const rowsHtml = players.map(p => {
+          totGP += p.gp;
+          totD1 += p.d1;
+          totD7 += p.d7;
+          totD30 += p.d30;
+          totPts += p.pts;
+
+          const rs = roundStats[p.rnd];
+          const rRank = rs.getRank(p.pts);
+          if (rRank === 1) firstInRoundCount++;
+
+          let rankPillClass = 'pill-neutral';
+          if (rRank === 1) rankPillClass = 'pill-gold';
+          else if (rRank <= 3) rankPillClass = 'pill-pos';
+          else if (rRank === rs.count && rs.count > 2) rankPillClass = 'pill-neg';
+
+          const isMax = (p.pts === rs.maxPts);
+          const isMin = (p.pts === rs.minPts && rs.count > 1);
+
+          return `<tr>
+            <td class="center"><span class="pos-badge pos-${p.pos}">${p.pos}</span></td>
+            <td class="center" style="font-weight:700; color:var(--text-secondary);">${p.rnd}</td>
+            <td>
+              <span style="font-weight:700; color:#fff;">${p.name}</span>
+              ${formatStatusBadge(p.status)}
+            </td>
+            <td class="center" style="color:var(--text-secondary); font-size:0.76rem;">${p.nhl}</td>
+            <td class="num">${p.gp === 0 ? '-' : p.gp}</td>
+            <td class="num" style="color:var(--text-muted);">${p.d1}</td>
+            <td class="num" style="color:var(--text-secondary);">${p.d7}</td>
+            <td class="num" style="color:var(--text-secondary);">${p.d30}</td>
+            <td class="num" style="font-weight:800; color:#fff; font-size:0.9rem;">${p.pts}</td>
+            <td class="center"><span class="pill ${rankPillClass}">${rRank} / ${rs.count}</span></td>
+            <td class="num" style="color:${isMax ? 'var(--accent-gold)' : 'var(--accent-green)'}; font-weight:${isMax ? '800' : '600'};">${rs.maxPts}</td>
+            <td class="num" style="color:${isMin ? 'var(--accent-red)' : 'var(--text-muted)'}; font-weight:${isMin ? '700' : '400'};">${rs.minPts}</td>
+          </tr>`;
+        }).join('');
+
+        return `<div class="roster-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; padding-bottom:0.65rem; border-bottom:1px solid var(--border-color);">
+            <div class="team-cell">
+              <span class="rank-badge ${idx < 3 ? 'rank-' + (idx + 1) : ''}">${idx + 1}</span>
+              <div class="nhl-badge" style="width:36px; height:36px;">${getNHLBadgeHTML(tm.nhl_team)}</div>
+              <div class="team-name-wrap">
+                <span class="team-name" style="border-left: 3px solid ${tm.color}; padding-left: 6px;">${tm.name}</span>
+                <span class="team-nhl-sub">${tm.nhl_team_fr}</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:1.2rem; font-weight:800; color:var(--accent-gold);">${totPts} pts</div>
+              <div style="font-size:0.74rem; color:var(--text-secondary);">${firstInRoundCount}× 1er de ronde • ${totGP} MJ</div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="roster-table">
+              <thead>
+                <tr>
+                  <th class="center" title="Position (F=Attaquant, D=Défenseur, G=Gardien)">Pos</th>
+                  <th class="center" title="Ronde de repêchage">Rnd</th>
+                  <th>Joueur</th>
+                  <th class="center">Éq.</th>
+                  <th class="num" title="Matchs joués">MJ</th>
+                  <th class="num" title="Points hier (1j)">1j</th>
+                  <th class="num" title="Points 7 derniers jours">7j</th>
+                  <th class="num" title="Points 30 derniers jours">30j</th>
+                  <th class="num" title="Points totaux du joueur">PPts</th>
+                  <th class="center" title="Rang du joueur parmi tous les choix de cette ronde">Rang Rd</th>
+                  <th class="num" title="Maximum de points dans cette ronde">Max Rd</th>
+                  <th class="num" title="Minimum de points dans cette ronde">Min Rd</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4">Total ${tm.name}</td>
+                  <td class="num">${totGP}</td>
+                  <td class="num">${totD1}</td>
+                  <td class="num">${totD7}</td>
+                  <td class="num">${totD30}</td>
+                  <td class="num" style="color:var(--accent-gold); font-size:0.95rem;">${totPts}</td>
+                  <td colspan="3" class="center" style="font-size:0.74rem; color:var(--text-secondary); font-weight:600;">
+                    Moy: ${(totPts / 20).toFixed(1)} pts/joueur
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
     function renderCharts(timeline) {
       renderLineChart('chart-rank', timeline, 'rank', {
         minVal: 1,
@@ -1592,7 +3927,7 @@
 
     function moveTooltip(evt) {
       const tt = document.getElementById('tooltip');
-      tt.style.left = (evt.clientX + 14) + 'px';
+      tt.style.left = Math.min(evt.clientX + 14, window.innerWidth - 230) + 'px';
       tt.style.top = (evt.clientY + 14) + 'px';
     }
 
