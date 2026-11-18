@@ -747,7 +747,7 @@
       "name": "Bricius",
       "nhl_team": "PHI",
       "nhl_team_fr": "Flyers de Philadelphie",
-      "color": "#F74902",
+      "color": "#FF6B00",
       "secondary_color": "#000000",
       "line_style": "solid"
     },
@@ -756,7 +756,7 @@
       "name": "Coco",
       "nhl_team": "MTL",
       "nhl_team_fr": "Canadiens de Montréal",
-      "color": "#AF1E2D",
+      "color": "#22C55E",
       "secondary_color": "#192168",
       "line_style": "solid"
     },
@@ -765,7 +765,7 @@
       "name": "Fly_98",
       "nhl_team": "PHI",
       "nhl_team_fr": "Flyers de Philadelphie",
-      "color": "#FF8C42",
+      "color": "#A855F7",
       "secondary_color": "#000000",
       "line_style": "dashed"
     },
@@ -774,7 +774,7 @@
       "name": "Kheldar",
       "nhl_team": "SEA",
       "nhl_team_fr": "Kraken de Seattle",
-      "color": "#68A2B9",
+      "color": "#38BDF8",
       "secondary_color": "#001628",
       "line_style": "solid"
     },
@@ -783,7 +783,7 @@
       "name": "Oliv",
       "nhl_team": "MTL",
       "nhl_team_fr": "Canadiens de Montréal",
-      "color": "#3B82F6",
+      "color": "#E11D48",
       "secondary_color": "#AF1E2D",
       "line_style": "dashed"
     },
@@ -792,7 +792,7 @@
       "name": "Pens73",
       "nhl_team": "PIT",
       "nhl_team_fr": "Penguins de Pittsburgh",
-      "color": "#FCB514",
+      "color": "#FACC15",
       "secondary_color": "#000000",
       "line_style": "solid"
     },
@@ -801,7 +801,7 @@
       "name": "Ray77",
       "nhl_team": "MTL",
       "nhl_team_fr": "Canadiens de Montréal",
-      "color": "#EF4444",
+      "color": "#F472B6",
       "secondary_color": "#FFFFFF",
       "line_style": "dotted"
     },
@@ -810,7 +810,7 @@
       "name": "Sharkdark",
       "nhl_team": "SJS",
       "nhl_team_fr": "Sharks de San Jose",
-      "color": "#00A3AD",
+      "color": "#14B8A6",
       "secondary_color": "#EA7200",
       "line_style": "solid"
     }
@@ -3723,8 +3723,8 @@
         const isVisible = activeTeams.has(pk.teamId);
         const y = yFor(pk.pts);
         const h = Math.max(pad.top + plotH - y, 2);
-        const opacity = isVisible ? (pk.rndRank === 1 ? '1' : '0.88') : '0.12';
-        const stroke = (isVisible && pk.rndRank === 1) ? '#fbbf24' : 'none';
+        const opacity = isVisible ? '1' : '0.12';
+        const stroke = (isVisible && pk.rndRank === 1) ? '#ffffff' : 'none';
 
         const tipHtml = encodeURIComponent(
           `<strong>#${pk.overall} • ${pk.name} (${pk.nhl})</strong><br/>` +
@@ -3736,7 +3736,7 @@
 
         barsSvg += `
           <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5"
-            fill="${pk.team.color}" opacity="${opacity}" stroke="${stroke}" stroke-width="1"
+            fill="${pk.team.color}" opacity="${opacity}" stroke="${stroke}" stroke-width="0.9"
             style="cursor:pointer"
             onmouseenter="showTooltip(event, decodeURIComponent('${tipHtml}'))"
             onmousemove="moveTooltip(event)"
